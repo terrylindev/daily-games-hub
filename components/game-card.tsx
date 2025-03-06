@@ -97,7 +97,7 @@ export default function GameCard({ game }: GameCardProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 rounded-full hover:bg-muted"
+            className="h-8 w-8 rounded-full hover:bg-muted hover:scale-110 transition-all duration-200 cursor-pointer"
             onClick={handleFavoriteClick}
           >
             <Star

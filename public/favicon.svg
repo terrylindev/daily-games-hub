@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gamepad -->
+  <path d="M21.3333 16V20C21.3333 22.2091 19.5425 24 17.3333 24H14.6667C12.4575 24 10.6667 22.2091 10.6667 20V16M21.3333 16L24 13.3333C25.4728 11.8605 25.4728 9.47281 24 8L23.3333 7.33333C21.8605 5.86054 19.4728 5.86054 18 7.33333L16 9.33333M21.3333 16H10.6667M10.6667 16L8 13.3333C6.52721 11.8605 6.52721 9.47281 8 8L8.66667 7.33333C10.1395 5.86054 12.5272 5.86054 14 7.33333L16 9.33333M16 9.33333V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Dice -->
+  <path d="M24 12L24 18C24 19.1046 23.1046 20 22 20L16 20C14.8954 20 14 19.1046 14 18L14 12C14 10.8954 14.8954 10 16 10L22 10C23.1046 10 24 10.8954 24 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="18" cy="13" r="1" fill="currentColor"/>
+  <circle cx="20" cy="15" r="1" fill="currentColor"/>
+  <circle cx="20" cy="17" r="1" fill="currentColor"/>
+</svg> 

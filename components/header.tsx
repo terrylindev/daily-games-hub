@@ -5,7 +5,15 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MoonIcon, SunIcon, SearchIcon, Star, Home } from "lucide-react";
+import {
+  MoonIcon,
+  SunIcon,
+  SearchIcon,
+  Star,
+  Home,
+  Gamepad2,
+  Dices,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function Header() {
@@ -23,10 +31,16 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="container flex h-16 items-center justify-between mx-auto px-4 max-w-1xl">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold">Daily Games Hub</span>
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <div className="relative flex items-center">
+              <Gamepad2 className="h-8 w-8 text-primary" />
+              <Dices className="h-5 w-5 text-primary absolute -right-1 -top-2" />
+            </div>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
@@ -71,6 +85,7 @@ export default function Header() {
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="hover:scale-110 transition-all duration-200 cursor-pointer"
           >
             <SunIcon className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <MoonIcon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
