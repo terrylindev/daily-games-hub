@@ -1,7 +1,7 @@
 import { Github } from "lucide-react";
 
 export default function Footer() {
-  const quote = "One game a day keeps boredom away 🎮";
+  const quote = "One game a day keeps boredom away. 🎮";
 
   return (
     <footer className="w-full border-t border-border/40 bg-background">
