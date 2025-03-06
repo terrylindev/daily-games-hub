@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { games } from "@/lib/games-data";
 import GamesGrid from "@/components/games-grid";
-import CategoryFilter from "@/components/category-filter";
 
 export default function FavoritesPage() {
   const [favoriteGames, setFavoriteGames] = useState<typeof games>([]);
@@ -27,8 +26,6 @@ export default function FavoritesPage() {
           Games you&apos;ve marked as favorites
         </p>
       </section>
-
-      <CategoryFilter />
 
       {isLoading ? (
         <div className="py-12 text-center">Loading your favorites...</div>

@@ -1,14 +1,14 @@
 import { Suspense } from "react";
 import { games, categories, getGamesByCategory } from "@/lib/games-data";
-import GamesGrid from "@/components/games-grid";
 import CategoryFilter from "@/components/category-filter";
 import SuggestGame from "@/components/suggest-game";
+import ExpandableGamesGrid from "../components/expandable-games-grid";
 
 export default function Home() {
   // Get popular games (sorted by popularity)
   const popularGames = [...games]
     .sort((a, b) => b.popularity - a.popularity)
-    .slice(0, 8);
+    .slice(0, 12);
 
   return (
     <div className="space-y-8">
@@ -30,7 +30,7 @@ export default function Home() {
       <CategoryFilter />
 
       <Suspense fallback={<div>Loading popular games...</div>}>
-        <GamesGrid
+        <ExpandableGamesGrid
           games={popularGames}
           title="Popular Games"
           description="The most popular daily games to play right now"
@@ -46,8 +46,8 @@ export default function Home() {
             key={category.id}
             fallback={<div>Loading {category.name}...</div>}
           >
-            <GamesGrid
-              games={categoryGames.slice(0, 4)}
+            <ExpandableGamesGrid
+              games={categoryGames}
               title={category.name}
               description={category.description}
             />

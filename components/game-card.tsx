@@ -57,11 +57,13 @@ export default function GameCard({ game }: GameCardProps) {
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
       word: "bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20",
-      geography: "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20",
-      trivia: "bg-amber-500/10 text-amber-500 hover:bg-amber-500/20",
-      math: "bg-rose-500/10 text-rose-500 hover:bg-rose-500/20",
+      geography: "bg-lime-500/10 text-lime-500 hover:bg-lime-500/20",
       music: "bg-purple-500/10 text-purple-500 hover:bg-purple-500/20",
+      movies: "bg-amber-500/10 text-amber-500 hover:bg-amber-500/20",
+      gaming: "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20",
       sports: "bg-sky-500/10 text-sky-500 hover:bg-sky-500/20",
+      math: "bg-rose-500/10 text-rose-500 hover:bg-rose-500/20",
+      other: "bg-slate-500/10 text-slate-500 hover:bg-slate-500/20",
     };
 
     return (
@@ -74,10 +76,12 @@ export default function GameCard({ game }: GameCardProps) {
     const categories: Record<string, string> = {
       word: "Word",
       geography: "Geography",
-      trivia: "Trivia",
       math: "Math",
       music: "Music",
+      movies: "TV",
+      gaming: "Gaming",
       sports: "Sports",
+      other: "Other",
     };
 
     return categories[category] || category;
