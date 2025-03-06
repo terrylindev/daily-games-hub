@@ -32,7 +32,7 @@ export default function Home() {
       <Suspense fallback={<div>Loading popular games...</div>}>
         <ExpandableGamesGrid
           games={popularGames}
-          title="Popular Games"
+          title="Popular Games 🔥"
           description="The most popular daily games to play right now"
         />
       </Suspense>

@@ -17,42 +17,42 @@ export type Category = {
 export const categories: Category[] = [
   {
     id: "word",
-    name: "Word Games",
+    name: "Word Games 📝",
     description: "Daily word puzzles and challenges",
   },
   {
     id: "geography",
-    name: "Geography",
+    name: "Geography 🌍",
     description: "Test your knowledge of places and locations",
   },
   {
     id: "music",
-    name: "Music",
+    name: "Music 🎵",
     description: "Test your music knowledge and listening skills",
   },
   {
     id: "movies",
-    name: "Movies & TV",
+    name: "Movies & TV 🎬",
     description: "Guess the movie or TV show from a series of clues",
   },
   {
     id: "gaming",
-    name: "Gaming",
+    name: "Gaming 🎮",
     description: "Test your gaming knowledge"
   },
   {
     id: "sports",
-    name: "Sports",
+    name: "Sports ⚽",
     description: "Sports-themed puzzles and prediction games",
   },
   {
     id: "math",
-    name: "Math & Logic",
+    name: "Math & Logic 🔢",
     description: "Number puzzles and logic challenges",
   },
   {
     id: "other",
-    name: "Other",
+    name: "Other 🎯",
     description: "Various themed daily challenges and puzzles",
   },
 ];

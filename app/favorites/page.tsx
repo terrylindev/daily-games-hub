@@ -21,7 +21,7 @@ export default function FavoritesPage() {
   return (
     <div className="space-y-8">
       <section className="py-6">
-        <h1 className="text-3xl font-bold tracking-tight">Your Favorites</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Your Favorites 🌟</h1>
         <p className="mt-2 text-muted-foreground">
           Games you&apos;ve marked as favorites
         </p>
