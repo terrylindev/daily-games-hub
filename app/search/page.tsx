@@ -3,14 +3,13 @@ import { searchGames } from "@/lib/games-data";
 import GamesGrid from "@/components/games-grid";
 import CategoryFilter from "@/components/category-filter";
 
-interface SearchPageProps {
-  searchParams: {
-    q?: string;
-  };
-}
+type PageProps = {
+  params: Promise<Record<string, never>>;
+  searchParams: Promise<{ q?: string }>;
+};
 
-export default function SearchPage({ searchParams }: SearchPageProps) {
-  const query = searchParams.q || "";
+export default async function SearchPage({ searchParams }: PageProps) {
+  const { q: query = "" } = await searchParams;
   const games = query ? searchGames(query) : [];
 
   return (

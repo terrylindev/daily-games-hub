@@ -4,11 +4,10 @@ import { categories, getGamesByCategory } from "@/lib/games-data";
 import GamesGrid from "@/components/games-grid";
 import CategoryFilter from "@/components/category-filter";
 
-interface CategoryPageProps {
-  params: {
-    id: string;
-  };
-}
+type PageProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
 
 export function generateStaticParams() {
   return categories.map((category) => ({
@@ -16,9 +15,9 @@ export function generateStaticParams() {
   }));
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
-  // Make sure params.id is available
-  const categoryId = params.id;
+export default async function CategoryPage({ params }: PageProps) {
+  // Await the params since they're now a Promise
+  const { id: categoryId } = await params;
   const category = categories.find((c) => c.id === categoryId);
 
   if (!category) {
