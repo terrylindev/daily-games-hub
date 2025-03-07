@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Game } from "@/lib/games-data";
+import FaviconImage from "./favicon-image";
 
 interface GameCardProps {
   game: Game;
@@ -116,7 +117,16 @@ export default function GameCard({ game }: GameCardProps) {
         </div>
 
         <div className="space-y-2">
-          <h3 className="font-semibold text-lg">{game.name}</h3>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 flex-shrink-0 rounded-sm overflow-hidden bg-white/5 flex items-center justify-center shadow-sm border border-muted/20">
+              <FaviconImage
+                url={game.url}
+                category={game.category}
+                name={game.name}
+              />
+            </div>
+            <h3 className="font-semibold text-lg">{game.name}</h3>
+          </div>
           <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
             {game.description}
           </p>
