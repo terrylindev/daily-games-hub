@@ -814,6 +814,15 @@ export const games: Game[] = [
     tags: ["math", "logic", "numbers"],
     popularity: 9,
   },
+  {
+    id: "wiki-game",
+    name: "The Wiki Game",
+    description: "Race from one Wikipedia page to another in the least number of steps",
+    url: "https://www.thewikigamedaily.com",
+    category: "other",
+    tags: ["wikipedia", "speedrun"],
+    popularity: 10,
+  }
 ];
 
 // Helper function to get games by category
