@@ -75,15 +75,12 @@ export default function SuggestGame() {
         setIssueUrl(data.issueUrl);
       }
 
-      // Reset form after 5 seconds
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setGameName("");
-        setGameUrl("");
-        setGameDescription("");
-        setGameCategory("");
-        setIsOpen(false);
-      }, 5000);
+      // Reset form fields but keep dialog open with success message
+      setGameName("");
+      setGameUrl("");
+      setGameDescription("");
+      setGameCategory("");
+      setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting suggestion:", error);
       setErrorMessage(
