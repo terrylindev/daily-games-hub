@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { categories } from "@/lib/games-data";
+import { toast } from "sonner";
 
 export default function SuggestGame() {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,17 +33,49 @@ export default function SuggestGame() {
   const [gameCategory, setGameCategory] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [issueUrl, setIssueUrl] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage("");
 
-    // Simulate submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Get the category name from the category ID
+      const categoryObj = categories.find((c) => c.id === gameCategory);
+      const categoryName = categoryObj?.name || "";
+
+      // Submit to our API endpoint
+      const response = await fetch("/api/suggest-game", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: gameName,
+          url: gameUrl,
+          description: gameDescription,
+          category: gameCategory,
+          categoryName: categoryName,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to submit suggestion");
+      }
+
+      // Show success message
       setIsSubmitted(true);
 
-      // Reset form after 3 seconds
+      // Store the issue URL if available
+      if (data.issueUrl) {
+        setIssueUrl(data.issueUrl);
+      }
+
+      // Reset form after 5 seconds
       setTimeout(() => {
         setIsSubmitted(false);
         setGameName("");
@@ -50,20 +83,34 @@ export default function SuggestGame() {
         setGameDescription("");
         setGameCategory("");
         setIsOpen(false);
-      }, 3000);
-    }, 1000);
-
-    // In a real app, you would submit to your backend
-    console.log({
-      name: gameName,
-      url: gameUrl,
-      description: gameDescription,
-      category: gameCategory,
-    });
+      }, 5000);
+    } catch (error) {
+      console.error("Error submitting suggestion:", error);
+      setErrorMessage(
+        error instanceof Error ? error.message : "An unknown error occurred"
+      );
+      setIsSubmitting(false);
+      toast.error("Failed to submit suggestion. Please try again.");
+    }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) {
+          // Reset form when dialog is closed
+          setIsSubmitted(false);
+          setGameName("");
+          setGameUrl("");
+          setGameDescription("");
+          setGameCategory("");
+          setErrorMessage("");
+          setIssueUrl("");
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button
           size="lg"
@@ -88,12 +135,28 @@ export default function SuggestGame() {
               Thank you for your suggestion!
             </h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              We&apos;ll review your suggestion and add it to our directory if
-              it meets our criteria.
+              We&apos;ve received your suggestion and will review it soon.
             </p>
+            {issueUrl && (
+              <p className="mt-4 text-sm">
+                <a
+                  href={issueUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  View your suggestion on GitHub
+                </a>
+              </p>
+            )}
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 py-4">
+            {errorMessage && (
+              <div className="p-3 text-sm bg-red-50 text-red-500 rounded-md">
+                {errorMessage}
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="game-name">Game Name</Label>
               <Input
@@ -124,7 +187,7 @@ export default function SuggestGame() {
                 onValueChange={setGameCategory}
                 required
               >
-                <SelectTrigger>
+                <SelectTrigger className="cursor-pointer">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -154,6 +217,7 @@ export default function SuggestGame() {
                 type="button"
                 variant="outline"
                 onClick={() => setIsOpen(false)}
+                className="cursor-pointer"
               >
                 Cancel
               </Button>
