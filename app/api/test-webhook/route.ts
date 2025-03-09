@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { addGameToDataFile } from '@/lib/game-utils;
+import { addGameToDataFile } from '@/lib/game-utils';
 import { sendNotification } from '@/lib/email-utils';
 
 export async function POST(request: Request) {
