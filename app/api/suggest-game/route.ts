@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   try {
     // Parse the request body
     const body = await request.json();
-    const { name, url, description, category, categoryName } = body;
+    const { name, url, description, category, categoryName, email } = body;
     
     // Validate required fields
     if (!name || !url || !description || !category) {
@@ -39,6 +39,7 @@ export async function POST(request: Request) {
         `**URL:** ${url}\n\n` +
         `**Category:** ${categoryName || category}\n\n` +
         `**Description:**\n${description}\n\n` +
+        (email ? `**Contact Email:** ${email}\n\n` : '') +
         `---\n*Submitted via Daily Games Hub suggestion form*`
     });
     

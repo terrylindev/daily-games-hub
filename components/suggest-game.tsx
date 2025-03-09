@@ -31,6 +31,7 @@ export default function SuggestGame() {
   const [gameUrl, setGameUrl] = useState("");
   const [gameDescription, setGameDescription] = useState("");
   const [gameCategory, setGameCategory] = useState("");
+  const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -58,6 +59,7 @@ export default function SuggestGame() {
           description: gameDescription,
           category: gameCategory,
           categoryName: categoryName,
+          email: email.trim() || null, // Include email if provided
         }),
       });
 
@@ -80,6 +82,7 @@ export default function SuggestGame() {
       setGameUrl("");
       setGameDescription("");
       setGameCategory("");
+      setEmail("");
       setIsSubmitting(false);
     } catch (error) {
       console.error("Error submitting suggestion:", error);
@@ -103,6 +106,7 @@ export default function SuggestGame() {
           setGameUrl("");
           setGameDescription("");
           setGameCategory("");
+          setEmail("");
           setErrorMessage("");
           setIssueUrl("");
         }
@@ -132,7 +136,9 @@ export default function SuggestGame() {
               Thank you for your suggestion!
             </h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              We&apos;ve received your suggestion and will review it soon.
+              {email
+                ? `We've received your suggestion and will review it soon. We'll notify you when we make a decision.`
+                : `We've received your suggestion and will review it soon.`}
             </p>
             {issueUrl && (
               <p className="mt-4 text-sm">
@@ -209,6 +215,22 @@ export default function SuggestGame() {
               />
             </div>
 
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="email">Email (Optional)</Label>
+                <span className="text-xs text-muted-foreground">
+                  Get notified when your game is added
+                </span>
+              </div>
+              <Input
+                id="email"
+                type="email"
+                placeholder="example@gmail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
             <DialogFooter>
               <Button
                 type="button"
@@ -233,21 +255,6 @@ export default function SuggestGame() {
             </DialogFooter>
           </form>
         )}
-
-        <div className="pt-2 text-xs text-muted-foreground">
-          <p>
-            You can also submit game suggestions directly on our{" "}
-            <a
-              href="https://github.com/liny18/daily-games-hub/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              GitHub repository
-            </a>
-            .
-          </p>
-        </div>
       </DialogContent>
     </Dialog>
   );
