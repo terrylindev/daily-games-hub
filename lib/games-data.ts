@@ -5,7 +5,7 @@ export type Game = {
   url: string;
   category: string;
   tags: string[];
-  popularity: number; // 1-10 scale for sorting
+  popularity: number; // 1-5 scale for sorting
 };
 
 export type Category = {
@@ -65,7 +65,7 @@ export const games: Game[] = [
     url: "https://www.nytimes.com/games/wordle/index.html",
     category: "word",
     tags: ["word", "puzzle"],
-    popularity: 10,
+    popularity: 5,
   },
   {
     id: "connections",
@@ -73,8 +73,8 @@ export const games: Game[] = [
     description: "Find connections between groups of words",
     url: "https://www.nytimes.com/games/connections",
     category: "word",
-    tags: ["word", "puzzle", "groups"],
-    popularity: 10,
+    tags: ["word", "puzzle", "grouping"],
+    popularity: 5,
   },
   {
     id: "worldle",
@@ -83,7 +83,7 @@ export const games: Game[] = [
     url: "https://worldle.teuteuf.fr/",
     category: "geography",
     tags: ["geography", "countries"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "timeguessr",
@@ -92,7 +92,7 @@ export const games: Game[] = [
     url: "https://timeguessr.com/",
     category: "geography",
     tags: ["geography", "history", "photos"],
-    popularity: 9,
+    popularity: 4,
   },
   {
     id: "globle",
@@ -101,7 +101,7 @@ export const games: Game[] = [
     url: "https://globle-game.com/",
     category: "geography",
     tags: ["geography", "countries"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "nerdle",
@@ -110,7 +110,7 @@ export const games: Game[] = [
     url: "https://nerdlegame.com/",
     category: "math",
     tags: ["math", "equation"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "heardle",
@@ -119,7 +119,7 @@ export const games: Game[] = [
     url: "https://heardlewordle.io/",
     category: "music",
     tags: ["music", "audio"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "framed",
@@ -128,7 +128,7 @@ export const games: Game[] = [
     url: "https://framed.wtf/",
     category: "movies",
     tags: ["movies", "screenshots"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "immaculate-grid",
@@ -137,7 +137,7 @@ export const games: Game[] = [
     url: "https://www.immaculategrid.com/",
     category: "sports",
     tags: ["sports", "grid", "players"],
-    popularity: 9,
+    popularity: 4,
   },
   {
     id: "poeltl",
@@ -146,7 +146,7 @@ export const games: Game[] = [
     url: "https://poeltl.nbpa.com",
     category: "sports",
     tags: ["sports", "basketball", "nba"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "crosswordle",
@@ -155,7 +155,7 @@ export const games: Game[] = [
     url: "https://crosswordle.com/",
     category: "word",
     tags: ["word", "puzzle", "crossword"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "waffle",
@@ -164,7 +164,7 @@ export const games: Game[] = [
     url: "https://wafflegame.net/",
     category: "word",
     tags: ["word", "puzzle", "rearrange"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "mathler",
@@ -173,7 +173,7 @@ export const games: Game[] = [
     url: "https://www.mathler.com/",
     category: "math",
     tags: ["math", "calculation"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "countryle",
@@ -182,7 +182,7 @@ export const games: Game[] = [
     url: "https://countryle.com/",
     category: "geography",
     tags: ["geography", "countries"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "flagle",
@@ -191,7 +191,7 @@ export const games: Game[] = [
     url: "https://www.flagle.io/",
     category: "geography",
     tags: ["geography", "flags"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "moviedle",
@@ -200,7 +200,7 @@ export const games: Game[] = [
     url: "https://likewise.com/games/moviedle",
     category: "movies",
     tags: ["movies", "clips"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "actorle",
@@ -209,7 +209,7 @@ export const games: Game[] = [
     url: "https://actorle.com/",
     category: "movies",
     tags: ["movies", "actors"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "loldle",
@@ -218,7 +218,7 @@ export const games: Game[] = [
     url: "https://loldle.net/",
     category: "gaming",
     tags: ["gaming", "lol"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "dungleon",
@@ -227,7 +227,7 @@ export const games: Game[] = [
     url: "https://www.dungleon.com/",
     category: "gaming",
     tags: ["gaming", "rpg"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "pictle",
@@ -236,7 +236,7 @@ export const games: Game[] = [
     url: "https://pictle.web.app/",
     category: "other",
     tags: ["pictures", "visual"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "pokedle",
@@ -245,7 +245,7 @@ export const games: Game[] = [
     url: "https://pokedle.net/",
     category: "gaming",
     tags: ["gaming", "anime", "pokemon"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "smashdle",
@@ -254,7 +254,7 @@ export const games: Game[] = [
     url: "https://smashdle.net/",
     category: "gaming",
     tags: ["gaming", "smash"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "onepiecedle",
@@ -263,7 +263,7 @@ export const games: Game[] = [
     url: "https://onepiecedle.net/",
     category: "movies",
     tags: ["anime", "onepiece"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "narutodle",
@@ -272,7 +272,7 @@ export const games: Game[] = [
     url: "https://narutodle.net/",
     category: "movies",
     tags: ["anime", "naruto"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "dotadle",
@@ -281,7 +281,7 @@ export const games: Game[] = [
     url: "https://dotadle.net/",
     category: "gaming",
     tags: ["gaming", "dota"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "squaredle",
@@ -290,7 +290,7 @@ export const games: Game[] = [
     url: "https://squaredle.app/",
     category: "word",
     tags: ["word", "puzzle", "grid"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "spelling-bee",
@@ -299,7 +299,7 @@ export const games: Game[] = [
     url: "https://www.nytimes.com/puzzles/spelling-bee",
     category: "word",
     tags: ["word", "spelling", "nytimes"],
-    popularity: 9,
+    popularity: 4,
   },
   {
     id: "mini-crossword",
@@ -308,7 +308,7 @@ export const games: Game[] = [
     url: "https://www.nytimes.com/crosswords/game/mini",
     category: "word",
     tags: ["word", "crossword", "nytimes"],
-    popularity: 9,
+    popularity: 4,
   },
   {
     id: "strands",
@@ -317,7 +317,7 @@ export const games: Game[] = [
     url: "https://www.nytimes.com/games/strands",
     category: "word",
     tags: ["word", "puzzle", "nytimes"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "lewdle",
@@ -326,7 +326,7 @@ export const games: Game[] = [
     url: "https://www.lewdlegame.com/App",
     category: "word",
     tags: ["word", "adult", "puzzle"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "redactle",
@@ -335,7 +335,7 @@ export const games: Game[] = [
     url: "https://redactle.net/",
     category: "word",
     tags: ["word", "wikipedia", "knowledge"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "contexto",
@@ -344,7 +344,7 @@ export const games: Game[] = [
     url: "https://contexto.me/",
     category: "word",
     tags: ["word", "semantics", "ai"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "geoguessr",
@@ -353,7 +353,7 @@ export const games: Game[] = [
     url: "https://www.geoguessr.com/",
     category: "geography",
     tags: ["geography", "maps", "streetview"],
-    popularity: 10,
+    popularity: 5,
   },
   {
     id: "statele",
@@ -362,7 +362,7 @@ export const games: Game[] = [
     url: "https://statele.teuteuf.fr/",
     category: "geography",
     tags: ["geography", "usa", "states"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "subwaydle",
@@ -371,7 +371,7 @@ export const games: Game[] = [
     url: "https://www.subwaydle.com/",
     category: "geography",
     tags: ["geography", "transit", "puzzle"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "cloudle",
@@ -380,7 +380,7 @@ export const games: Game[] = [
     url: "https://cloudle.app/",
     category: "geography",
     tags: ["geography", "weather", "forecast"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "gamedle",
@@ -389,7 +389,7 @@ export const games: Game[] = [
     url: "https://www.gamedle.wtf/",
     category: "gaming",
     tags: ["gaming", "screenshots", "videogames"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "guessthe-game",
@@ -398,7 +398,7 @@ export const games: Game[] = [
     url: "https://guessthe.game/",
     category: "gaming",
     tags: ["gaming", "images", "videogames"],
-    popularity: 9,
+    popularity: 4,
   },
   {
     id: "valorantle",
@@ -407,7 +407,7 @@ export const games: Game[] = [
     url: "https://valorantle.com/",
     category: "gaming",
     tags: ["gaming", "valorant", "fps"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "boxoffice-game",
@@ -416,7 +416,7 @@ export const games: Game[] = [
     url: "https://boxofficega.me/",
     category: "movies",
     tags: ["movies", "trivia"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "cinenerdle",
@@ -425,7 +425,7 @@ export const games: Game[] = [
     url: "https://www.cinenerdle.app/",
     category: "movies",
     tags: ["movies", "images", "clues"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "posterdle",
@@ -434,7 +434,7 @@ export const games: Game[] = [
     url: "https://likewise.com/games/posterdle",
     category: "movies",
     tags: ["movies", "posters", "visual"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "bandle",
@@ -443,7 +443,7 @@ export const games: Game[] = [
     url: "https://bandle.app/",
     category: "music",
     tags: ["music", "audio", "songs"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "musicle",
@@ -452,7 +452,7 @@ export const games: Game[] = [
     url: "https://musicle.app/",
     category: "music",
     tags: ["music", "artists", "songs"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "lyricle",
@@ -461,7 +461,7 @@ export const games: Game[] = [
     url: "https://lyricle.app/",
     category: "music",
     tags: ["music", "lyrics", "songs"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "numberle",
@@ -470,7 +470,7 @@ export const games: Game[] = [
     url: "https://numberle.org/",
     category: "math",
     tags: ["math", "numbers", "logic"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "primel",
@@ -479,7 +479,7 @@ export const games: Game[] = [
     url: "https://converged.yt/primel/",
     category: "math",
     tags: ["math", "prime", "numbers"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "sportsdle",
@@ -488,7 +488,7 @@ export const games: Game[] = [
     url: "https://www.sportsdle.com/",
     category: "sports",
     tags: ["sports"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "factle",
@@ -497,7 +497,7 @@ export const games: Game[] = [
     url: "https://factle.app/",
     category: "other",
     tags: ["trivia", "facts", "ranking"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "foodle",
@@ -506,7 +506,7 @@ export const games: Game[] = [
     url: "https://foodle.io/",
     category: "other",
     tags: ["food", "word", "puzzle"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "murdle",
@@ -515,7 +515,7 @@ export const games: Game[] = [
     url: "https://murdle.com/",
     category: "other",
     tags: ["mystery", "logic", "deduction"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "chronological",
@@ -524,7 +524,7 @@ export const games: Game[] = [
     url: "https://chronological.io/",
     category: "other",
     tags: ["history", "timeline", "events"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "wikitrivia",
@@ -533,7 +533,7 @@ export const games: Game[] = [
     url: "https://wikitrivia.tomjwatson.com/",
     category: "other",
     tags: ["history", "timeline", "wikipedia"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "antiwordle",
@@ -542,16 +542,16 @@ export const games: Game[] = [
     url: "https://www.antiwordle.com/",
     category: "word",
     tags: ["word", "puzzle", "opposite"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "kilordle",
     name: "Kilordle",
-    description: "Solve 1000 Wordle puzzles simultaneously",
+    description: "Solve 500 Wordle puzzles simultaneously",
     url: "https://jonesnxt.github.io/kilordle/",
     category: "word",
     tags: ["word", "puzzle", "multiple", "extreme"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "hello-wordl",
@@ -560,7 +560,7 @@ export const games: Game[] = [
     url: "https://hellowordl.net/",
     category: "word",
     tags: ["word", "puzzle", "customizable"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "letterle",
@@ -569,7 +569,7 @@ export const games: Game[] = [
     url: "https://edjefferson.com/letterle/",
     category: "word",
     tags: ["word", "puzzle", "joke"],
-    popularity: 5,
+    popularity: 1,
   },
   {
     id: "passwordle",
@@ -578,7 +578,7 @@ export const games: Game[] = [
     url: "https://passwordle.com/",
     category: "word",
     tags: ["word", "security", "password"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "byrdle",
@@ -587,7 +587,7 @@ export const games: Game[] = [
     url: "https://www.byrdle.net/",
     category: "music",
     tags: ["music", "choral", "classical"],
-    popularity: 5,
+    popularity: 1,
   },
   {
     id: "beadle",
@@ -596,7 +596,7 @@ export const games: Game[] = [
     url: "https://beadle.gg/",
     category: "music",
     tags: ["music", "beatles", "rock"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "swiftle",
@@ -605,7 +605,7 @@ export const games: Game[] = [
     url: "https://taylordle.org/",
     category: "music",
     tags: ["music", "taylor swift", "pop"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "citydle",
@@ -614,7 +614,7 @@ export const games: Game[] = [
     url: "https://citydle.com/",
     category: "geography",
     tags: ["geography", "cities", "streetview"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "airportle",
@@ -623,7 +623,7 @@ export const games: Game[] = [
     url: "https://airportle.glitch.me/",
     category: "geography",
     tags: ["geography", "airports", "travel"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "travle",
@@ -632,7 +632,7 @@ export const games: Game[] = [
     url: "https://travle.earth",
     category: "geography",
     tags: ["geography", "countries", "flags"],
-    popularity: 8,
+    popularity: 3,
   },
   {
     id: "stewardle",
@@ -641,7 +641,7 @@ export const games: Game[] = [
     url: "https://stewardle.com/",
     category: "sports",
     tags: ["sports", "racing", "f1"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "gameofthrones",
@@ -650,7 +650,7 @@ export const games: Game[] = [
     url: "https://gotdle.net/",
     category: "movies",
     tags: ["tv", "game of thrones", "fantasy"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "lordle",
@@ -659,7 +659,7 @@ export const games: Game[] = [
     url: "https://digitaltolkien.github.io/vue-wordle/",
     category: "movies",
     tags: ["movies", "lord of the rings", "fantasy"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "marvel-wordle",
@@ -668,7 +668,7 @@ export const games: Game[] = [
     url: "https://marvelwordle.netlify.app/",
     category: "movies",
     tags: ["movies", "marvel", "superheroes"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "hogwartle",
@@ -677,7 +677,7 @@ export const games: Game[] = [
     url: "https://www.hogwartsishere.com/hogwartle/",
     category: "movies",
     tags: ["movies", "harry potter", "fantasy"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "minecraftle",
@@ -686,7 +686,7 @@ export const games: Game[] = [
     url: "https://minecraftle.zachmanson.com/",
     category: "gaming",
     tags: ["gaming", "minecraft", "items"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "eldrow",
@@ -695,7 +695,7 @@ export const games: Game[] = [
     url: "https://www.simn.me/eldrow/",
     category: "word",
     tags: ["word", "puzzle"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "emovi",
@@ -704,7 +704,7 @@ export const games: Game[] = [
     url: "https://emovi.teuteuf.fr/",
     category: "movies",
     tags: ["movies", "emojis", "puzzle"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "foodguessr",
@@ -713,7 +713,7 @@ export const games: Game[] = [
     url: "https://foodguessr.com/",
     category: "other",
     tags: ["food", "geography", "photos"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "artle",
@@ -722,7 +722,7 @@ export const games: Game[] = [
     url: "https://www.nga.gov/artle.html",
     category: "other",
     tags: ["art", "artists", "paintings"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "book-dle",
@@ -731,7 +731,7 @@ export const games: Game[] = [
     url: "https://www.book-dle.com/",
     category: "other",
     tags: ["books", "literature"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "bookdle",
@@ -740,7 +740,7 @@ export const games: Game[] = [
     url: "https://likewise.com/games/bookdle",
     category: "other",
     tags: ["books", "literature"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "costcodle",
@@ -749,7 +749,7 @@ export const games: Game[] = [
     url: "https://costcodle.com/",
     category: "other",
     tags: ["shopping", "prices", "retail"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "birdle",
@@ -758,7 +758,7 @@ export const games: Game[] = [
     url: "https://www.play-birdle.com/",
     category: "other",
     tags: ["birds", "nature", "animals"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "animordle",
@@ -767,7 +767,7 @@ export const games: Game[] = [
     url: "https://www.animordle.com/",
     category: "other",
     tags: ["animals", "nature", "photos"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "lingule",
@@ -776,7 +776,7 @@ export const games: Game[] = [
     url: "https://lingule.xyz/",
     category: "other",
     tags: ["languages", "linguistics"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "emotle",
@@ -785,7 +785,7 @@ export const games: Game[] = [
     url: "https://emotle.com/",
     category: "other",
     tags: ["emotions", "faces", "psychology"],
-    popularity: 6,
+    popularity: 1,
   },
   {
     id: "stockle",
@@ -794,7 +794,7 @@ export const games: Game[] = [
     url: "https://stockle.win/",
     category: "other",
     tags: ["stocks", "finance", "markets"],
-    popularity: 7,
+    popularity: 2,
   },
   {
     id: "daily-chess-puzzle",
@@ -803,16 +803,16 @@ export const games: Game[] = [
     url: "https://lichess.org/training/daily",
     category: "other",
     tags: ["chess", "puzzle", "strategy"],
-    popularity: 8,
+    popularity: 3,
   },
   {
-    id: "Sudoku",
+    id: "sudoku",
     name: "Sudoku",
     description: "Solve a daily sudoku",
     url: "https://www.nytimes.com/puzzles/sudoku",
     category: "math",
     tags: ["math", "logic", "numbers"],
-    popularity: 9,
+    popularity: 4,
   },
   {
     id: "wiki-game",
@@ -821,8 +821,125 @@ export const games: Game[] = [
     url: "https://www.thewikigamedaily.com",
     category: "other",
     tags: ["wikipedia", "speedrun"],
-    popularity: 10,
-  }
+    popularity: 5,
+  },
+  {
+    id: "minute-cryptic",
+    name: "Minute Cryptic",
+    description: "Solve a cryptic crossword style clue",
+    url: "https://www.minutecryptic.com/",
+    category: "word",
+    tags: ["word", "puzzle", "crossword"],
+    popularity: 3,
+  },
+  {
+    id: "thrice",
+    name: "Thrice",
+    description: "Answer trivia questions within clues",
+    url: "https://catfishing.net/",
+    category: "other",
+    tags: ["trivia", "puzzle", "clues"],
+    popularity: 2,
+  },
+  {
+    id: "catfishing",
+    name: "Catfishing",
+    description: "Guess the Wikipedia article from its categories",
+    url: "https://thrice.geekswhodrink.com/",
+    category: "other",
+    tags: ["wikipedia", "puzzle"],
+    popularity: 2,
+  },
+  {
+    id: "letter-brew",
+    name: "Letter Brew",
+    description: "Solve mini word puzzles then figure out what word can be made from the answers",
+    url: "https://www.ted.com/games/letter-brew",
+    category: "word",
+    tags: ["word", "puzzle"],
+    popularity: 2,
+  },
+  {
+    id: "aniguessr",
+    name: "AniGuessr",
+    description: "Guess the anime from a screenshot, opening, and identify its characters",
+    url: "https://aniguessr.com",
+    category: "movies",
+    tags: ["anime"],
+    popularity: 2,
+  },
+  {
+    id: "sqnces",
+    name: "Sqnces",
+    description: "Uncover the hidden word given a 3 letter sequence",
+    url: "https://sqnces.com",
+    category: "word",
+    tags: ["word", "puzzle"],
+    popularity: 2,
+  },
+  {
+    id: "daily-trivia",
+    name: "Daily Trivia",
+    description: "Answer 5 new trivia questions every day",
+    url: "https://www.playdailytrivia.com",
+    category: "other",
+    tags: ["trivia"],
+    popularity: 2,
+  },
+  {
+    id: "tradle",
+    name: "Tradle",
+    description: "Guess the country by its top exports",
+    url: "https://games.oec.world/en/tradle/",
+    category: "geography",
+    tags: ["geography"],
+    popularity: 1,
+  },
+  {
+    id: "circuits",
+    name: "Circuits",
+    description: "Enter words to complete the circuit",
+    url: "https://circuitsgame.com/",
+    category: "word",
+    tags: ["word", "puzzle"],
+    popularity: 1,
+  },
+  {
+    id: "daily-walkoff",
+    name: "Daily Walkoff",
+    description: "Place players in trivia columns for MLB teams",
+    url: "https://www.dailywalkoff.com/",
+    category: "sports",
+    tags: ["sports", "baseball"],
+    popularity: 2,
+  },
+  {
+    id: "matle",
+    name: "Matle",
+    description: "Wordle for chess; reveal hidden squares in a checkmate position",
+    url: "https://www.matle.io/",
+    category: "other",
+    tags: ["chess", "puzzle", "strategy"],
+    popularity: 2,
+  },
+  {
+    id: "orbits",
+    name: "Orbits",
+    description: "Sort words into a self-completing loop",
+    url: "https://www.playorbits.com",
+    category: "word",
+    tags: ["word", "puzzle", "grouping"],
+    popularity: 1,
+  },
+  {
+    id: "worchle",
+    name: "Worchle",
+    description: "Daily word search game inspired by Wordle",
+    url: "https://www.playorbits.com",
+    category: "word",
+    tags: ["word", "puzzle"],
+    popularity: 1,
+  },
 ];
 
 // Helper function to get games by category
