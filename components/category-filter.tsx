@@ -61,7 +61,7 @@ export default function CategoryFilter() {
         className="cursor-pointer transition-colors hover:bg-primary/90 hover:text-primary-foreground ml-auto"
       >
         <Sparkles className="mr-2 h-4 w-4" />
-        {isLoading ? "Finding..." : "Try this!"}
+        {isLoading ? "Finding..." : "Surprise me!"}
       </Button>
     </div>
   );
