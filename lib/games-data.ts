@@ -940,6 +940,15 @@ export const games: Game[] = [
     tags: ["word", "puzzle"],
     popularity: 1,
   },
+  {
+    id: "quordle",
+    name: "Quordle",
+    description: "Solve 4 Wordles simultaneously",
+    url: "https://www.merriam-webster.com/games/quordle",
+    category: "word",
+    tags: ["word", "puzzle"],
+    popularity: 3,
+  },
 ];
 
 // Helper function to get games by category
