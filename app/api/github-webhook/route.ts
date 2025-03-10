@@ -24,6 +24,15 @@ function extractEmail(body: string): string | null {
   return emailMatch ? emailMatch[1].trim() : null;
 }
 
+// Extract tags from issue body
+function extractTags(body: string): string[] {
+  const tagsMatch = body.match(/\*\*Tags:\*\* (.*?)(\n|$)/);
+  if (!tagsMatch) return [];
+  
+  // Split by commas, trim each tag, and convert to lowercase
+  return tagsMatch[1].split(',').map((tag: string) => tag.trim().toLowerCase());
+}
+
 // Add a GET handler to respond to GitHub's webhook verification
 export async function GET() {
   return NextResponse.json({ message: 'GitHub webhook endpoint is active' });
@@ -85,11 +94,15 @@ export async function POST(request: Request) {
     const categoryMatch = issueBody.match(/\*\*Category:\*\* (.*?)(\n|$)/);
     const descriptionMatch = issueBody.match(/\*\*Description:\*\*\n([\s\S]*?)(\n\n|$)/);
     const email = extractEmail(issueBody);
+    const tags = extractTags(issueBody);
     
     const gameName = nameMatch ? nameMatch[1].trim() : '';
     const gameUrl = urlMatch ? urlMatch[1].trim() : '';
     const gameCategory = categoryMatch ? categoryMatch[1].trim().toLowerCase().split(' ')[0] : '';
     const gameDescription = descriptionMatch ? descriptionMatch[1].trim() : '';
+    
+    // Filter out any tags that match the category (redundant)
+    const validTags = tags.filter((tag: string) => tag !== gameCategory);
     
     // Check if the issue was closed with a "completed" label
     const isCompleted = data.issue.labels?.some((label: { name?: string }) => 
@@ -128,7 +141,8 @@ export async function POST(request: Request) {
         gameName, 
         gameUrl, 
         gameDescription, 
-        gameCategory
+        gameCategory,
+        validTags
       );
       
       // Send notification if email is provided

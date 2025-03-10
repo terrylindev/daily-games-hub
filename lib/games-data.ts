@@ -64,7 +64,7 @@ export const games: Game[] = [
     description: "Guess the five-letter word in six tries with color-coded hints",
     url: "https://www.nytimes.com/games/wordle/index.html",
     category: "word",
-    tags: ["word", "puzzle"],
+    tags: ["puzzle"],
     popularity: 5,
   },
   {
@@ -73,7 +73,7 @@ export const games: Game[] = [
     description: "Find connections between groups of words",
     url: "https://www.nytimes.com/games/connections",
     category: "word",
-    tags: ["word", "puzzle", "grouping"],
+    tags: ["puzzle", "grouping"],
     popularity: 5,
   },
   {
@@ -82,7 +82,7 @@ export const games: Game[] = [
     description: "Guess the country by its silhouette",
     url: "https://worldle.teuteuf.fr/",
     category: "geography",
-    tags: ["geography", "countries"],
+    tags: ["countries"],
     popularity: 3,
   },
   {
@@ -91,7 +91,7 @@ export const games: Game[] = [
     description: "Guess the year a photo was taken",
     url: "https://timeguessr.com/",
     category: "geography",
-    tags: ["geography", "history", "photos"],
+    tags: ["history", "photos"],
     popularity: 4,
   },
   {
@@ -100,7 +100,7 @@ export const games: Game[] = [
     description: "Guess the country with proximity hints",
     url: "https://globle-game.com/",
     category: "geography",
-    tags: ["geography", "countries"],
+    tags: ["countries"],
     popularity: 2,
   },
   {
@@ -109,7 +109,7 @@ export const games: Game[] = [
     description: "Guess the equation with number hints",
     url: "https://nerdlegame.com/",
     category: "math",
-    tags: ["math", "equation"],
+    tags: ["equation"],
     popularity: 2,
   },
   {
@@ -118,7 +118,7 @@ export const games: Game[] = [
     description: "Guess the song from short audio clips",
     url: "https://heardlewordle.io/",
     category: "music",
-    tags: ["music", "audio"],
+    tags: ["audio"],
     popularity: 3,
   },
   {
@@ -127,7 +127,7 @@ export const games: Game[] = [
     description: "Guess the movie from screenshots",
     url: "https://framed.wtf/",
     category: "movies",
-    tags: ["movies", "screenshots"],
+    tags: ["screenshots"],
     popularity: 3,
   },
   {
@@ -136,7 +136,7 @@ export const games: Game[] = [
     description: "Fill a 3x3 grid with players who match the criteria",
     url: "https://www.immaculategrid.com/",
     category: "sports",
-    tags: ["sports", "grid", "players"],
+    tags: ["grid", "players"],
     popularity: 4,
   },
   {
@@ -145,7 +145,7 @@ export const games: Game[] = [
     description: "Guess the NBA player with limited clues",
     url: "https://poeltl.nbpa.com",
     category: "sports",
-    tags: ["sports", "basketball", "nba"],
+    tags: ["basketball", "nba"],
     popularity: 2,
   },
   {
@@ -154,7 +154,7 @@ export const games: Game[] = [
     description: "A crossword-style Wordle variant with multiple words",
     url: "https://crosswordle.com/",
     category: "word",
-    tags: ["word", "puzzle", "crossword"],
+    tags: ["puzzle", "crossword"],
     popularity: 2,
   },
   {
@@ -163,7 +163,7 @@ export const games: Game[] = [
     description: "Rearrange letters to form six words in a waffle pattern",
     url: "https://wafflegame.net/",
     category: "word",
-    tags: ["word", "puzzle", "rearrange"],
+    tags: ["puzzle", "rearrange"],
     popularity: 3,
   },
   {
@@ -172,7 +172,7 @@ export const games: Game[] = [
     description: "Find the hidden calculation that equals the target number",
     url: "https://www.mathler.com/",
     category: "math",
-    tags: ["math", "calculation"],
+    tags: ["calculation"],
     popularity: 1,
   },
   {
@@ -181,7 +181,7 @@ export const games: Game[] = [
     description: "Guess the country with hints about location, population, and more",
     url: "https://countryle.com/",
     category: "geography",
-    tags: ["geography", "countries"],
+    tags: ["countries"],
     popularity: 1,
   },
   {
@@ -190,7 +190,7 @@ export const games: Game[] = [
     description: "Guess the country from its flag, revealed piece by piece",
     url: "https://www.flagle.io/",
     category: "geography",
-    tags: ["geography", "flags"],
+    tags: ["flags"],
     popularity: 2,
   },
   {
@@ -199,7 +199,7 @@ export const games: Game[] = [
     description: "Guess the movie from a 1-second clip that gets longer with each guess",
     url: "https://likewise.com/games/moviedle",
     category: "movies",
-    tags: ["movies", "clips"],
+    tags: ["clips"],
     popularity: 2,
   },
   {
@@ -208,7 +208,7 @@ export const games: Game[] = [
     description: "Guess the actor from their filmography clues",
     url: "https://actorle.com/",
     category: "movies",
-    tags: ["movies", "actors"],
+    tags: ["actors"],
     popularity: 1,
   },
   {
@@ -217,7 +217,7 @@ export const games: Game[] = [
     description: "Guess the League of Legends champion using various clues",
     url: "https://loldle.net/",
     category: "gaming",
-    tags: ["gaming", "lol"],
+    tags: ["lol"],
     popularity: 3,
   },
   {
@@ -226,7 +226,7 @@ export const games: Game[] = [
     description: "A daily dungeon crawler where every player gets the same run",
     url: "https://www.dungleon.com/",
     category: "gaming",
-    tags: ["gaming", "rpg"],
+    tags: ["rpg"],
     popularity: 2,
   },
   {
@@ -244,7 +244,7 @@ export const games: Game[] = [
     description: "Guess the Pokémon using type, generation, and stat clues",
     url: "https://pokedle.net/",
     category: "gaming",
-    tags: ["gaming", "anime", "pokemon"],
+    tags: ["anime", "pokemon"],
     popularity: 3,
   },
   {
@@ -253,7 +253,7 @@ export const games: Game[] = [
     description: "Guess the Smash character from a series of clues",
     url: "https://smashdle.net/",
     category: "gaming",
-    tags: ["gaming", "smash"],
+    tags: ["smash"],
     popularity: 2,
   },
   {
@@ -280,7 +280,7 @@ export const games: Game[] = [
     description: "Guess the Dota character from a series of clues",
     url: "https://dotadle.net/",
     category: "gaming",
-    tags: ["gaming", "dota"],
+    tags: ["dota"],
     popularity: 2,
   },
   {
@@ -289,7 +289,7 @@ export const games: Game[] = [
     description: "Find words in a grid of letters by connecting adjacent squares",
     url: "https://squaredle.app/",
     category: "word",
-    tags: ["word", "puzzle", "grid"],
+    tags: ["puzzle", "grid"],
     popularity: 2,
   },
   {
@@ -298,7 +298,7 @@ export const games: Game[] = [
     description: "Create words using the given letters with the center letter required",
     url: "https://www.nytimes.com/puzzles/spelling-bee",
     category: "word",
-    tags: ["word", "spelling", "nytimes"],
+    tags: ["spelling", "nytimes"],
     popularity: 4,
   },
   {
@@ -307,7 +307,7 @@ export const games: Game[] = [
     description: "A small, quick crossword puzzle that changes daily",
     url: "https://www.nytimes.com/crosswords/game/mini",
     category: "word",
-    tags: ["word", "crossword", "nytimes"],
+    tags: ["crossword", "nytimes"],
     popularity: 4,
   },
   {
@@ -316,7 +316,7 @@ export const games: Game[] = [
     description: "Connect words that share a theme in a grid of letters",
     url: "https://www.nytimes.com/games/strands",
     category: "word",
-    tags: ["word", "puzzle", "nytimes"],
+    tags: ["puzzle", "nytimes"],
     popularity: 3,
   },
   {
@@ -325,7 +325,7 @@ export const games: Game[] = [
     description: "Like Wordle, but with lewd words only",
     url: "https://www.lewdlegame.com/App",
     category: "word",
-    tags: ["word", "adult", "puzzle"],
+    tags: ["adult", "puzzle"],
     popularity: 1,
   },
   {
@@ -334,7 +334,7 @@ export const games: Game[] = [
     description: "Guess the redacted Wikipedia article by revealing words",
     url: "https://redactle.net/",
     category: "word",
-    tags: ["word", "wikipedia", "knowledge"],
+    tags: ["wikipedia"],
     popularity: 2,
   },
   {
@@ -343,7 +343,7 @@ export const games: Game[] = [
     description: "Guess the secret word by semantic similarity",
     url: "https://contexto.me/",
     category: "word",
-    tags: ["word", "semantics", "ai"],
+    tags: ["semantics", "ai"],
     popularity: 3,
   },
   {
@@ -352,7 +352,7 @@ export const games: Game[] = [
     description: "Guess where in the world you are from Street View images",
     url: "https://www.geoguessr.com/",
     category: "geography",
-    tags: ["geography", "maps", "streetview"],
+    tags: ["maps", "streetview"],
     popularity: 5,
   },
   {
@@ -361,7 +361,7 @@ export const games: Game[] = [
     description: "Guess the US state from its outline",
     url: "https://statele.teuteuf.fr/",
     category: "geography",
-    tags: ["geography", "usa", "states"],
+    tags: ["usa", "states"],
     popularity: 2,
   },
   {
@@ -370,7 +370,7 @@ export const games: Game[] = [
     description: "Find a valid NYC subway route between two stations",
     url: "https://www.subwaydle.com/",
     category: "geography",
-    tags: ["geography", "transit", "puzzle"],
+    tags: ["transit", "puzzle"],
     popularity: 2,
   },
   {
@@ -379,7 +379,7 @@ export const games: Game[] = [
     description: "Guess the 5-day weather forecast for a mystery city",
     url: "https://cloudle.app/",
     category: "geography",
-    tags: ["geography", "weather", "forecast"],
+    tags: ["weather", "forecast"],
     popularity: 1,
   },
   {
@@ -388,7 +388,7 @@ export const games: Game[] = [
     description: "Guess the video game from screenshots and clues",
     url: "https://www.gamedle.wtf/",
     category: "gaming",
-    tags: ["gaming", "screenshots", "videogames"],
+    tags: ["screenshots", "videogames"],
     popularity: 3,
   },
   {
@@ -397,7 +397,7 @@ export const games: Game[] = [
     description: "Identify the video game from a small cropped image",
     url: "https://guessthe.game/",
     category: "gaming",
-    tags: ["gaming", "images", "videogames"],
+    tags: ["images", "videogames"],
     popularity: 4,
   },
   {
@@ -406,7 +406,7 @@ export const games: Game[] = [
     description: "Guess the Valorant agent from a series of clues",
     url: "https://valorantle.com/",
     category: "gaming",
-    tags: ["gaming", "valorant", "fps"],
+    tags: ["valorant"],
     popularity: 2,
   },
   {
@@ -415,7 +415,7 @@ export const games: Game[] = [
     description: "Guess the top 5 movies from a past weekend's box office",
     url: "https://boxofficega.me/",
     category: "movies",
-    tags: ["movies", "trivia"],
+    tags: ["trivia"],
     popularity: 3,
   },
   {
@@ -424,7 +424,7 @@ export const games: Game[] = [
     description: "Guess the movie from images and clues",
     url: "https://www.cinenerdle.app/",
     category: "movies",
-    tags: ["movies", "images", "clues"],
+    tags: ["images", "clues"],
     popularity: 2,
   },
   {
@@ -433,7 +433,7 @@ export const games: Game[] = [
     description: "Guess the movie from its poster as it becomes clearer",
     url: "https://likewise.com/games/posterdle",
     category: "movies",
-    tags: ["movies", "posters", "visual"],
+    tags: ["posters", "visual"],
     popularity: 2,
   },
   {
@@ -442,7 +442,7 @@ export const games: Game[] = [
     description: "Guess the song, one instrument at a time",
     url: "https://bandle.app/",
     category: "music",
-    tags: ["music", "audio", "songs"],
+    tags: ["audio", "songs"],
     popularity: 3,
   },
   {
@@ -451,7 +451,7 @@ export const games: Game[] = [
     description: "Guess the artist from song titles",
     url: "https://musicle.app/",
     category: "music",
-    tags: ["music", "artists", "songs"],
+    tags: ["artists", "songs"],
     popularity: 2,
   },
   {
@@ -460,7 +460,7 @@ export const games: Game[] = [
     description: "Guess the song from its lyrics",
     url: "https://lyricle.app/",
     category: "music",
-    tags: ["music", "lyrics", "songs"],
+    tags: ["lyrics", "songs"],
     popularity: 2,
   },
   {
@@ -469,7 +469,7 @@ export const games: Game[] = [
     description: "Guess the hidden number with numerical hints",
     url: "https://numberle.org/",
     category: "math",
-    tags: ["math", "numbers", "logic"],
+    tags: ["numbers", "logic"],
     popularity: 1,
   },
   {
@@ -478,7 +478,7 @@ export const games: Game[] = [
     description: "Guess the 5-digit prime number",
     url: "https://converged.yt/primel/",
     category: "math",
-    tags: ["math", "prime", "numbers"],
+    tags: ["numbers"],
     popularity: 1,
   },
   {
@@ -487,7 +487,7 @@ export const games: Game[] = [
     description: "Guess the player from clues",
     url: "https://www.sportsdle.com/",
     category: "sports",
-    tags: ["sports"],
+    tags: ["puzzle"],
     popularity: 2,
   },
   {
@@ -496,7 +496,7 @@ export const games: Game[] = [
     description: "Rank items in a list based on a factual question",
     url: "https://factle.app/",
     category: "other",
-    tags: ["trivia", "facts", "ranking"],
+    tags: ["trivia", "ranking"],
     popularity: 2,
   },
   {
@@ -514,7 +514,7 @@ export const games: Game[] = [
     description: "Solve a daily murder mystery with logic deduction",
     url: "https://murdle.com/",
     category: "other",
-    tags: ["mystery", "logic", "deduction"],
+    tags: ["mystery", "logic"],
     popularity: 3,
   },
   {
@@ -523,7 +523,7 @@ export const games: Game[] = [
     description: "Arrange historical events in chronological order",
     url: "https://chronological.io/",
     category: "other",
-    tags: ["history", "timeline", "events"],
+    tags: ["history"],
     popularity: 2,
   },
   {
@@ -532,7 +532,7 @@ export const games: Game[] = [
     description: "Arrange historical events on a timeline",
     url: "https://wikitrivia.tomjwatson.com/",
     category: "other",
-    tags: ["history", "timeline", "wikipedia"],
+    tags: ["history", "wikipedia"],
     popularity: 2,
   },
   {
@@ -541,16 +541,16 @@ export const games: Game[] = [
     description: "Try NOT to guess the word - opposite of Wordle",
     url: "https://www.antiwordle.com/",
     category: "word",
-    tags: ["word", "puzzle", "opposite"],
+    tags: ["puzzle"],
     popularity: 2,
   },
   {
     id: "kilordle",
     name: "Kilordle",
-    description: "Solve 500 Wordle puzzles simultaneously",
+    description: "Solve 1000 Wordle puzzles simultaneously",
     url: "https://jonesnxt.github.io/kilordle/",
     category: "word",
-    tags: ["word", "puzzle", "multiple", "extreme"],
+    tags: ["puzzle"],
     popularity: 1,
   },
   {
@@ -559,7 +559,7 @@ export const games: Game[] = [
     description: "Wordle with customizable word length",
     url: "https://hellowordl.net/",
     category: "word",
-    tags: ["word", "puzzle", "customizable"],
+    tags: ["puzzle"],
     popularity: 2,
   },
   {
@@ -568,7 +568,7 @@ export const games: Game[] = [
     description: "Guess the single letter (yes, really)",
     url: "https://edjefferson.com/letterle/",
     category: "word",
-    tags: ["word", "puzzle", "joke"],
+    tags: ["puzzle"],
     popularity: 1,
   },
   {
@@ -577,7 +577,7 @@ export const games: Game[] = [
     description: "Guess the password with security-themed hints",
     url: "https://passwordle.com/",
     category: "word",
-    tags: ["word", "security", "password"],
+    tags: ["puzzle"],
     popularity: 1,
   },
   {
@@ -586,7 +586,7 @@ export const games: Game[] = [
     description: "Guess the choral music term",
     url: "https://www.byrdle.net/",
     category: "music",
-    tags: ["music", "choral", "classical"],
+    tags: ["choral", "classical"],
     popularity: 1,
   },
   {
@@ -595,7 +595,7 @@ export const games: Game[] = [
     description: "Guess the Beatles song from a snippet",
     url: "https://beadle.gg/",
     category: "music",
-    tags: ["music", "beatles", "rock"],
+    tags: ["beatles", "rock"],
     popularity: 2,
   },
   {
@@ -604,7 +604,7 @@ export const games: Game[] = [
     description: "Guess the Taylor Swift song from a snippet",
     url: "https://taylordle.org/",
     category: "music",
-    tags: ["music", "taylor swift", "pop"],
+    tags: ["taylor swift", "pop"],
     popularity: 3,
   },
   {
@@ -613,7 +613,7 @@ export const games: Game[] = [
     description: "Guess the city from a street view",
     url: "https://citydle.com/",
     category: "geography",
-    tags: ["geography", "cities", "streetview"],
+    tags: ["cities", "streetview"],
     popularity: 2,
   },
   {
@@ -622,7 +622,7 @@ export const games: Game[] = [
     description: "Guess the airport from its 3-letter code",
     url: "https://airportle.glitch.me/",
     category: "geography",
-    tags: ["geography", "airports", "travel"],
+    tags: ["airports", "travel"],
     popularity: 1,
   },
   {
@@ -631,7 +631,7 @@ export const games: Game[] = [
     description: "Travel from the Start Country to the End Country. Try to get there in the fewest guesses!",
     url: "https://travle.earth",
     category: "geography",
-    tags: ["geography", "countries", "flags"],
+    tags: ["countries", "flags"],
     popularity: 3,
   },
   {
@@ -640,7 +640,7 @@ export const games: Game[] = [
     description: "Guess the Formula 1 driver",
     url: "https://stewardle.com/",
     category: "sports",
-    tags: ["sports", "racing", "f1"],
+    tags: ["racing", "f1"],
     popularity: 2,
   },
   {
@@ -649,7 +649,7 @@ export const games: Game[] = [
     description: "Guess the Game of Thrones character",
     url: "https://gotdle.net/",
     category: "movies",
-    tags: ["tv", "game of thrones", "fantasy"],
+    tags: ["game of thrones", "fantasy"],
     popularity: 2,
   },
   {
@@ -658,7 +658,7 @@ export const games: Game[] = [
     description: "Wordle with Lord of the Rings vocabulary",
     url: "https://digitaltolkien.github.io/vue-wordle/",
     category: "movies",
-    tags: ["movies", "lord of the rings", "fantasy"],
+    tags: ["lord of the rings", "fantasy"],
     popularity: 2,
   },
   {
@@ -667,7 +667,7 @@ export const games: Game[] = [
     description: "Guess the Marvel character",
     url: "https://marvelwordle.netlify.app/",
     category: "movies",
-    tags: ["movies", "marvel", "superheroes"],
+    tags: ["marvel", "superheroes"],
     popularity: 2,
   },
   {
@@ -676,7 +676,7 @@ export const games: Game[] = [
     description: "Guess the Harry Potter character",
     url: "https://www.hogwartsishere.com/hogwartle/",
     category: "movies",
-    tags: ["movies", "harry potter", "fantasy"],
+    tags: ["harry potter", "fantasy"],
     popularity: 2,
   },
   {
@@ -685,7 +685,7 @@ export const games: Game[] = [
     description: "Guess the Minecraft item",
     url: "https://minecraftle.zachmanson.com/",
     category: "gaming",
-    tags: ["gaming", "minecraft", "items"],
+    tags: ["minecraft"],
     popularity: 2,
   },
   {
@@ -694,7 +694,7 @@ export const games: Game[] = [
     description: "Reverse Wordle - computer guesses your word",
     url: "https://www.simn.me/eldrow/",
     category: "word",
-    tags: ["word", "puzzle"],
+    tags: ["puzzle"],
     popularity: 1,
   },
   {
@@ -703,7 +703,7 @@ export const games: Game[] = [
     description: "Guess the movie from emojis",
     url: "https://emovi.teuteuf.fr/",
     category: "movies",
-    tags: ["movies", "emojis", "puzzle"],
+    tags: ["emojis", "puzzle"],
     popularity: 2,
   },
   {
@@ -784,7 +784,7 @@ export const games: Game[] = [
     description: "Guess the emotion from facial expressions",
     url: "https://emotle.com/",
     category: "other",
-    tags: ["emotions", "faces", "psychology"],
+    tags: ["emotions", "psychology"],
     popularity: 1,
   },
   {
@@ -793,7 +793,7 @@ export const games: Game[] = [
     description: "Guess the stock from its price chart",
     url: "https://stockle.win/",
     category: "other",
-    tags: ["stocks", "finance", "markets"],
+    tags: ["stocks", "finance"],
     popularity: 2,
   },
   {
@@ -811,7 +811,7 @@ export const games: Game[] = [
     description: "Solve a daily sudoku",
     url: "https://www.nytimes.com/puzzles/sudoku",
     category: "math",
-    tags: ["math", "logic", "numbers"],
+    tags: ["logic", "numbers"],
     popularity: 4,
   },
   {
@@ -829,7 +829,7 @@ export const games: Game[] = [
     description: "Solve a cryptic crossword style clue",
     url: "https://www.minutecryptic.com/",
     category: "word",
-    tags: ["word", "puzzle", "crossword"],
+    tags: ["puzzle", "crossword"],
     popularity: 3,
   },
   {
@@ -856,7 +856,7 @@ export const games: Game[] = [
     description: "Solve mini word puzzles then figure out what word can be made from the answers",
     url: "https://www.ted.com/games/letter-brew",
     category: "word",
-    tags: ["word", "puzzle"],
+    tags: ["puzzle"],
     popularity: 2,
   },
   {
@@ -874,7 +874,7 @@ export const games: Game[] = [
     description: "Uncover the hidden word given a 3 letter sequence",
     url: "https://sqnces.com",
     category: "word",
-    tags: ["word", "puzzle"],
+    tags: ["puzzle"],
     popularity: 2,
   },
   {
@@ -892,7 +892,7 @@ export const games: Game[] = [
     description: "Guess the country by its top exports",
     url: "https://games.oec.world/en/tradle/",
     category: "geography",
-    tags: ["geography"],
+    tags: ["puzzle"],
     popularity: 1,
   },
   {
@@ -901,7 +901,7 @@ export const games: Game[] = [
     description: "Enter words to complete the circuit",
     url: "https://circuitsgame.com/",
     category: "word",
-    tags: ["word", "puzzle"],
+    tags: ["puzzle"],
     popularity: 1,
   },
   {
@@ -910,7 +910,7 @@ export const games: Game[] = [
     description: "Place players in trivia columns for MLB teams",
     url: "https://www.dailywalkoff.com/",
     category: "sports",
-    tags: ["sports", "baseball"],
+    tags: ["baseball"],
     popularity: 2,
   },
   {
@@ -928,7 +928,7 @@ export const games: Game[] = [
     description: "Sort words into a self-completing loop",
     url: "https://www.playorbits.com",
     category: "word",
-    tags: ["word", "puzzle", "grouping"],
+    tags: ["puzzle", "grouping"],
     popularity: 1,
   },
   {
@@ -937,7 +937,7 @@ export const games: Game[] = [
     description: "Daily word search game inspired by Wordle",
     url: "https://www.playorbits.com",
     category: "word",
-    tags: ["word", "puzzle"],
+    tags: ["puzzle"],
     popularity: 1,
   },
   {
@@ -946,7 +946,7 @@ export const games: Game[] = [
     description: "Solve 4 Wordles simultaneously",
     url: "https://www.merriam-webster.com/games/quordle",
     category: "word",
-    tags: ["word", "puzzle"],
+    tags: ["puzzle"],
     popularity: 3,
   },
 ];

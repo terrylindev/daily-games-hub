@@ -10,12 +10,46 @@ export async function POST(request: Request) {
   try {
     // Parse the request body
     const body = await request.json();
-    const { name, url, description, category, categoryName, email } = body;
+    const { name, url, description, category, categoryName, tags = [], email } = body;
     
     // Validate required fields
     if (!name || !url || !description || !category) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+    
+    // Validate description length (max 100 characters)
+    if (description.length > 100) {
+      return NextResponse.json(
+        { error: 'Description is too long (max 100 characters)' },
+        { status: 400 }
+      );
+    }
+    
+    // Ensure all tags are lowercase
+    const lowerTags = tags.map((tag: string) => tag.toLowerCase());
+    
+    // Validate tag length (min 2, max 20 characters)
+    const validLengthTags = lowerTags.filter((tag: string) => 
+      tag.length >= 2 && tag.length <= 20
+    );
+    
+    if (validLengthTags.length !== lowerTags.length) {
+      return NextResponse.json(
+        { error: 'Tags must be between 2 and 20 characters' },
+        { status: 400 }
+      );
+    }
+    
+    // Validate tags (ensure they're not the same as the category)
+    const validTags = validLengthTags.filter((tag: string) => tag !== category);
+    
+    // Ensure we have no more than 3 tags
+    if (validTags.length > 3) {
+      return NextResponse.json(
+        { error: 'Maximum 3 tags allowed' },
         { status: 400 }
       );
     }
@@ -38,6 +72,7 @@ export async function POST(request: Request) {
         `**Name:** ${name}\n\n` +
         `**URL:** ${url}\n\n` +
         `**Category:** ${categoryName || category}\n\n` +
+        (validTags.length > 0 ? `**Tags:** ${validTags.join(', ')}\n\n` : '') +
         `**Description:**\n${description}\n\n` +
         (email ? `**Contact Email:** ${email}\n\n` : '') +
         `---\n*Submitted via Daily Games Hub suggestion form*`

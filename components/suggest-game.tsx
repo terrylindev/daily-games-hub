@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { categories } from "@/lib/games-data";
 import { toast } from "sonner";
 
@@ -31,11 +32,88 @@ export default function SuggestGame() {
   const [gameUrl, setGameUrl] = useState("");
   const [gameDescription, setGameDescription] = useState("");
   const [gameCategory, setGameCategory] = useState("");
+  const [customTags, setCustomTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [issueUrl, setIssueUrl] = useState("");
+  const [tagInputRef, setTagInputRef] = useState<HTMLInputElement | null>(null);
+
+  // Maximum description length
+  const MAX_DESCRIPTION_LENGTH = 500;
+  // Maximum tag length
+  const MAX_TAG_LENGTH = 20;
+
+  const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Convert to lowercase and limit length to MAX_TAG_LENGTH characters
+    const value = e.target.value.toLowerCase();
+    if (value.length <= MAX_TAG_LENGTH) {
+      setNewTag(value);
+    } else {
+      setNewTag(value.slice(0, MAX_TAG_LENGTH));
+    }
+  };
+
+  const handleAddTag = () => {
+    const trimmedTag = newTag.trim();
+
+    // Don't add empty tags
+    if (!trimmedTag) return;
+
+    // Don't add tags that are too short
+    if (trimmedTag.length < 2) {
+      toast.error("Tag must be at least 2 characters");
+      return;
+    }
+
+    // Don't add tags that match the category
+    if (trimmedTag === gameCategory) {
+      toast.error("Tag should not match the category");
+      setNewTag("");
+      tagInputRef?.focus();
+      return;
+    }
+
+    // Don't add duplicate tags
+    if (customTags.includes(trimmedTag)) {
+      toast.error("Tag already added");
+      setNewTag("");
+      tagInputRef?.focus();
+      return;
+    }
+
+    // Limit to 3 tags
+    if (customTags.length >= 3) {
+      toast.error("Maximum 3 tags allowed");
+      return;
+    }
+
+    setCustomTags([...customTags, trimmedTag]);
+    setNewTag("");
+    tagInputRef?.focus();
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setCustomTags(customTags.filter((tag) => tag !== tagToRemove));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
+
+  const handleDescriptionChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const value = e.target.value;
+    if (value.length <= MAX_DESCRIPTION_LENGTH) {
+      setGameDescription(value);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +137,8 @@ export default function SuggestGame() {
           description: gameDescription,
           category: gameCategory,
           categoryName: categoryName,
-          email: email.trim() || null, // Include email if provided
+          tags: customTags,
+          email: email.trim() || null,
         }),
       });
 
@@ -82,6 +161,8 @@ export default function SuggestGame() {
       setGameUrl("");
       setGameDescription("");
       setGameCategory("");
+      setCustomTags([]);
+      setNewTag("");
       setEmail("");
       setIsSubmitting(false);
     } catch (error) {
@@ -106,6 +187,8 @@ export default function SuggestGame() {
           setGameUrl("");
           setGameDescription("");
           setGameCategory("");
+          setCustomTags([]);
+          setNewTag("");
           setEmail("");
           setErrorMessage("");
           setIssueUrl("");
@@ -121,7 +204,7 @@ export default function SuggestGame() {
           Suggest a Game
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Suggest a Game</DialogTitle>
           <DialogDescription>
@@ -154,68 +237,156 @@ export default function SuggestGame() {
             )}
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          <form onSubmit={handleSubmit} className="space-y-3 py-2">
             {errorMessage && (
-              <div className="p-3 text-sm bg-red-50 text-red-500 rounded-md">
+              <div className="p-2 text-sm bg-red-50 text-red-500 rounded-md">
                 {errorMessage}
               </div>
             )}
-            <div className="space-y-2">
-              <Label htmlFor="game-name">Game Name</Label>
-              <Input
-                id="game-name"
-                placeholder="Enter the game's name"
-                value={gameName}
-                onChange={(e) => setGameName(e.target.value)}
-                required
-              />
+
+            {/* Basic Info Section */}
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="game-name" className="text-sm">
+                  Game Name
+                </Label>
+                <Input
+                  id="game-name"
+                  placeholder="Enter the game's name"
+                  value={gameName}
+                  onChange={(e) => setGameName(e.target.value)}
+                  required
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="game-url" className="text-sm">
+                  Game URL
+                </Label>
+                <Input
+                  id="game-url"
+                  type="url"
+                  placeholder="https://example.com"
+                  value={gameUrl}
+                  onChange={(e) => setGameUrl(e.target.value)}
+                  required
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="game-category" className="text-sm">
+                  Category
+                </Label>
+                <Select
+                  value={gameCategory}
+                  onValueChange={(value) => {
+                    setGameCategory(value);
+                    // Remove any tags that match the new category
+                    setCustomTags(customTags.filter((tag) => tag !== value));
+                  }}
+                  required
+                >
+                  <SelectTrigger className="cursor-pointer mt-1">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="game-url">Game URL</Label>
-              <Input
-                id="game-url"
-                type="url"
-                placeholder="https://example.com"
-                value={gameUrl}
-                onChange={(e) => setGameUrl(e.target.value)}
-                required
-              />
-            </div>
+            {/* Custom Tags Section */}
+            <div className="pt-1">
+              <div className="flex justify-between items-center">
+                <Label className="text-sm">Tags (Up to 3)</Label>
+                <span className="text-xs text-muted-foreground">
+                  {customTags.length}/3
+                </span>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="game-category">Category</Label>
-              <Select
-                value={gameCategory}
-                onValueChange={setGameCategory}
-                required
-              >
-                <SelectTrigger className="cursor-pointer">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
+              <div className="flex mt-1">
+                <div className="flex-1 relative">
+                  <Input
+                    placeholder="Add a tag"
+                    value={newTag}
+                    onChange={handleTagInputChange}
+                    onKeyDown={handleKeyDown}
+                    className="pr-12"
+                    disabled={customTags.length >= 3}
+                    ref={(el) => {
+                      setTagInputRef(el);
+                    }}
+                  />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-muted-foreground">
+                    {newTag.length}/{MAX_TAG_LENGTH}
+                  </span>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleAddTag}
+                  disabled={!newTag.trim() || customTags.length >= 3}
+                  className="ml-2"
+                >
+                  Add
+                </Button>
+              </div>
+
+              {customTags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {customTags.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="default"
+                      className="bg-primary text-primary-foreground text-xs py-0.5 flex items-center"
+                    >
+                      <span>{tag}</span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveTag(tag);
+                        }}
+                        className="ml-1 h-4 w-4 rounded-full inline-flex items-center justify-center hover:bg-primary-foreground/20"
+                        aria-label={`Remove ${tag} tag`}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
                   ))}
-                </SelectContent>
-              </Select>
+                </div>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="game-description">Description</Label>
+            {/* Description Section */}
+            <div>
+              <div className="flex justify-between items-center">
+                <Label htmlFor="game-description" className="text-sm">
+                  Description
+                </Label>
+                <span className="text-xs text-muted-foreground">
+                  {gameDescription.length}/{MAX_DESCRIPTION_LENGTH}
+                </span>
+              </div>
               <Textarea
                 id="game-description"
                 placeholder="Briefly describe the game..."
                 value={gameDescription}
-                onChange={(e) => setGameDescription(e.target.value)}
+                onChange={handleDescriptionChange}
                 required
-                className="min-h-[100px]"
+                className="mt-1 min-h-[80px]"
               />
             </div>
 
-            <div className="space-y-2">
+            {/* Email Section */}
+            <div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="email">Email (Optional)</Label>
                 <span className="text-xs text-muted-foreground">
@@ -225,18 +396,20 @@ export default function SuggestGame() {
               <Input
                 id="email"
                 type="email"
-                placeholder="example@gmail.com"
+                placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="mt-1"
               />
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="pt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsOpen(false)}
                 className="cursor-pointer"
+                size="sm"
               >
                 Cancel
               </Button>
@@ -249,8 +422,9 @@ export default function SuggestGame() {
                   !gameCategory ||
                   isSubmitting
                 }
+                size="sm"
               >
-                {isSubmitting ? "Submitting..." : "Submit Suggestion"}
+                {isSubmitting ? "Submitting..." : "Submit"}
               </Button>
             </DialogFooter>
           </form>
