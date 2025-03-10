@@ -28,24 +28,28 @@ function extractTags(body: string): string[] {
   return tagsMatch[1].split(',').map((tag: string) => tag.trim().toLowerCase());
 }
 
-// Add a GET handler to respond to GitHub's webhook verification
+// Simple GET handler for testing
 export async function GET() {
   return NextResponse.json({ message: 'GitHub webhook endpoint is active' });
 }
 
 export async function POST(request: Request) {
   try {
-    console.log('Webhook received:', new Date().toISOString());
+    console.log('Webhook received at /webhook:', new Date().toISOString());
+    console.log('Request URL:', request.url);
+    
+    // Log all headers for debugging
+    const headers: Record<string, string> = {};
+    request.headers.forEach((value, key) => {
+      headers[key] = value;
+    });
+    console.log('Request headers:', JSON.stringify(headers, null, 2));
     
     // Verify GitHub webhook signature
     const payload = await request.text();
-    const signature = request.headers.get('x-hub-signature-256') || '';
+    console.log('Payload length:', payload.length);
     
-    console.log('Headers received:', {
-      event: request.headers.get('x-github-event'),
-      delivery: request.headers.get('x-github-delivery'),
-      hasSignature: !!signature
-    });
+    const signature = request.headers.get('x-hub-signature-256') || '';
     
     if (!process.env.GITHUB_WEBHOOK_SECRET) {
       console.error('GITHUB_WEBHOOK_SECRET is not configured');
@@ -103,18 +107,15 @@ export async function POST(request: Request) {
       label.name?.toLowerCase() === 'has-contact-info'
     );
     
-    // Check if the issue was closed with a "completed" label
-    const isCompleted = data.issue.labels?.some((label: { name?: string }) => 
-      label.name?.toLowerCase() === 'completed' || 
-      label.name?.toLowerCase() === 'approved'
-    );
+    // Check the close reason (instead of looking for labels)
+    const closeReason = data.issue.state_reason || '';
+    console.log('Issue close reason:', closeReason);
     
-    // Check if the issue was closed with a "not planned" label
-    const isRejected = data.issue.labels?.some((label: { name?: string }) => 
-      label.name?.toLowerCase() === 'not planned' || 
-      label.name?.toLowerCase() === 'rejected' ||
-      label.name?.toLowerCase() === 'wontfix'
-    );
+    // Check if the issue was closed as "completed"
+    const isCompleted = closeReason.toLowerCase() === 'completed';
+    
+    // Check if the issue was closed as "not planned"
+    const isRejected = closeReason.toLowerCase() === 'not_planned';
     
     // Get the closing comment if any
     let closingComment = '';
@@ -159,6 +160,8 @@ export async function POST(request: Request) {
           
           // Delete the contact email after it's been used
           await deleteContactEmail(data.issue.number);
+          
+          console.log(`Sent 'added' notification to ${email} for game "${gameName}"`);
         } else {
           console.log(`No email found for issue #${data.issue.number}`);
         }
@@ -186,6 +189,8 @@ export async function POST(request: Request) {
         
         // Delete the contact email after it's been used
         await deleteContactEmail(data.issue.number);
+        
+        console.log(`Sent 'rejected' notification to ${email} for game "${gameName}"`);
       } else {
         console.log(`No email found for issue #${data.issue.number}`);
       }
