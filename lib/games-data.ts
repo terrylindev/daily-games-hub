@@ -949,6 +949,15 @@ export const games: Game[] = [
     tags: ["puzzle"],
     popularity: 3,
   },
+  {
+    id: "chiddle",
+    name: "Chiddle",
+    description: "Try to find five highest scoring words in the puzzle grid",
+    url: "https://www.chiddle.net",
+    category: "word",
+    tags: ["puzzle"],
+    popularity: 1,
+  },
 ];
 
 // Helper function to get games by category
