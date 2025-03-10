@@ -3,6 +3,7 @@ import { Octokit } from '@octokit/rest';
 import crypto from 'crypto';
 import { sendNotification } from '@/lib/email-utils';
 import { addGameToDataFile } from '@/lib/game-utils';
+import { getContactEmail, deleteContactEmail } from '@/lib/db';
 
 // Initialize Octokit with GitHub token
 const octokit = process.env.GITHUB_TOKEN 
@@ -16,34 +17,6 @@ function verifySignature(payload: string, signature: string): boolean {
   const hmac = crypto.createHmac('sha256', process.env.GITHUB_WEBHOOK_SECRET);
   const digest = 'sha256=' + hmac.update(payload).digest('hex');
   return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature));
-}
-
-// Extract email from issue comments
-async function extractEmailFromComments(owner: string, repo: string, issueNumber: number): Promise<string | null> {
-  if (!octokit) return null;
-  
-  try {
-    // Get all comments on the issue
-    const commentsResponse = await octokit.issues.listComments({
-      owner,
-      repo,
-      issue_number: issueNumber,
-      per_page: 100
-    });
-    
-    // Look for a comment containing the contact email
-    for (const comment of commentsResponse.data) {
-      const emailMatch = comment.body?.match(/\*\*Contact Email:\*\* (.*?)(\n|$)/);
-      if (emailMatch) {
-        return emailMatch[1].trim();
-      }
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Error extracting email from comments:', error);
-    return null;
-  }
 }
 
 // Extract tags from issue body
@@ -115,7 +88,6 @@ export async function POST(request: Request) {
     const urlMatch = issueBody.match(/\*\*URL:\*\* (.*?)(\n|$)/);
     const categoryMatch = issueBody.match(/\*\*Category:\*\* (.*?)(\n|$)/);
     const descriptionMatch = issueBody.match(/\*\*Description:\*\*\n([\s\S]*?)(\n\n|$)/);
-    const email = await extractEmailFromComments(data.repository.owner.login, data.repository.name, data.issue.number);
     const tags = extractTags(issueBody);
     
     const gameName = nameMatch ? nameMatch[1].trim() : '';
@@ -125,6 +97,11 @@ export async function POST(request: Request) {
     
     // Filter out any tags that match the category (redundant)
     const validTags = tags.filter((tag: string) => tag !== gameCategory);
+    
+    // Check if the issue has the "has-contact-info" label
+    const hasContactInfo = data.issue.labels?.some((label: { name?: string }) => 
+      label.name?.toLowerCase() === 'has-contact-info'
+    );
     
     // Check if the issue was closed with a "completed" label
     const isCompleted = data.issue.labels?.some((label: { name?: string }) => 
@@ -167,9 +144,24 @@ export async function POST(request: Request) {
         validTags
       );
       
-      // Send notification if email is provided
-      if (email && added) {
-        await sendNotification(email, gameName, 'added');
+      // Send notification if contact info is available
+      if (hasContactInfo && added) {
+        // Get the email from the database
+        const email = await getContactEmail(data.issue.number);
+        
+        if (email) {
+          // Send notification email
+          await sendNotification(
+            email,
+            gameName, 
+            'added'
+          );
+          
+          // Delete the contact email after it's been used
+          await deleteContactEmail(data.issue.number);
+        } else {
+          console.log(`No email found for issue #${data.issue.number}`);
+        }
       }
       
       return NextResponse.json({ 
@@ -179,8 +171,24 @@ export async function POST(request: Request) {
     }
     
     // Handle rejected suggestions
-    if (isRejected && email) {
-      await sendNotification(email, gameName, 'rejected', closingComment);
+    if (isRejected && hasContactInfo) {
+      // Get the email from the database
+      const email = await getContactEmail(data.issue.number);
+      
+      if (email) {
+        // Send notification email
+        await sendNotification(
+          email,
+          gameName, 
+          'rejected', 
+          closingComment
+        );
+        
+        // Delete the contact email after it's been used
+        await deleteContactEmail(data.issue.number);
+      } else {
+        console.log(`No email found for issue #${data.issue.number}`);
+      }
       
       return NextResponse.json({ 
         message: 'Rejection notification sent',

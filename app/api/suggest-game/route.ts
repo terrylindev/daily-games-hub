@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Octokit } from '@octokit/rest';
+import { storeContactEmail } from '@/lib/db';
 
 // Initialize Octokit with GitHub token
 const octokit = process.env.GITHUB_TOKEN 
@@ -77,14 +78,18 @@ export async function POST(request: Request) {
         `---\n*Submitted via Daily Games Hub suggestion form*`
     });
     
-    // Store email separately in a comment if provided (only visible to repo owners)
+    // If email is provided, store it securely in the database
     if (email) {
-      await octokit.issues.createComment({
+      // Add a label to indicate contact info is available
+      await octokit.issues.addLabels({
         owner: 'liny18',
         repo: 'daily-games-hub',
         issue_number: issueResponse.data.number,
-        body: `**Contact Email:** ${email}\n\n*This comment is only visible to repository maintainers.*`
+        labels: ['has-contact-info']
       });
+      
+      // Store the email in the database
+      await storeContactEmail(issueResponse.data.number, email);
     }
     
     // Return success response with issue URL
