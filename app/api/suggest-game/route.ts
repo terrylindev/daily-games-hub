@@ -74,9 +74,18 @@ export async function POST(request: Request) {
         `**Category:** ${categoryName || category}\n\n` +
         (validTags.length > 0 ? `**Tags:** ${validTags.join(', ')}\n\n` : '') +
         `**Description:**\n${description}\n\n` +
-        (email ? `**Contact Email:** ${email}\n\n` : '') +
         `---\n*Submitted via Daily Games Hub suggestion form*`
     });
+    
+    // Store email separately in a comment if provided (only visible to repo owners)
+    if (email) {
+      await octokit.issues.createComment({
+        owner: 'liny18',
+        repo: 'daily-games-hub',
+        issue_number: issueResponse.data.number,
+        body: `**Contact Email:** ${email}\n\n*This comment is only visible to repository maintainers.*`
+      });
+    }
     
     // Return success response with issue URL
     return NextResponse.json({

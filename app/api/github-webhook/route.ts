@@ -18,10 +18,32 @@ function verifySignature(payload: string, signature: string): boolean {
   return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature));
 }
 
-// Extract email from issue body
-function extractEmail(body: string): string | null {
-  const emailMatch = body.match(/\*\*Contact Email:\*\* (.*?)(\n|$)/);
-  return emailMatch ? emailMatch[1].trim() : null;
+// Extract email from issue comments
+async function extractEmailFromComments(owner: string, repo: string, issueNumber: number): Promise<string | null> {
+  if (!octokit) return null;
+  
+  try {
+    // Get all comments on the issue
+    const commentsResponse = await octokit.issues.listComments({
+      owner,
+      repo,
+      issue_number: issueNumber,
+      per_page: 100
+    });
+    
+    // Look for a comment containing the contact email
+    for (const comment of commentsResponse.data) {
+      const emailMatch = comment.body?.match(/\*\*Contact Email:\*\* (.*?)(\n|$)/);
+      if (emailMatch) {
+        return emailMatch[1].trim();
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error extracting email from comments:', error);
+    return null;
+  }
 }
 
 // Extract tags from issue body
@@ -93,7 +115,7 @@ export async function POST(request: Request) {
     const urlMatch = issueBody.match(/\*\*URL:\*\* (.*?)(\n|$)/);
     const categoryMatch = issueBody.match(/\*\*Category:\*\* (.*?)(\n|$)/);
     const descriptionMatch = issueBody.match(/\*\*Description:\*\*\n([\s\S]*?)(\n\n|$)/);
-    const email = extractEmail(issueBody);
+    const email = await extractEmailFromComments(data.repository.owner.login, data.repository.name, data.issue.number);
     const tags = extractTags(issueBody);
     
     const gameName = nameMatch ? nameMatch[1].trim() : '';
