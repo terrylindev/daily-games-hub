@@ -12,8 +12,8 @@ export async function addGameToDataFile(
   tags: string[] = []
 ): Promise<boolean> {
   try {
-    // Limit description length to 500 characters
-    const trimmedDescription = description.trim().slice(0, 500);
+    // Limit description length to 100 characters
+    const trimmedDescription = description.trim().slice(0, 100);
     
     // Ensure all tags are lowercase
     const lowerTags = tags.map(tag => tag.toLowerCase());

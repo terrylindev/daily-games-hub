@@ -42,7 +42,7 @@ export default function SuggestGame() {
   const [tagInputRef, setTagInputRef] = useState<HTMLInputElement | null>(null);
 
   // Maximum description length
-  const MAX_DESCRIPTION_LENGTH = 500;
+  const MAX_DESCRIPTION_LENGTH = 100;
   // Maximum tag length
   const MAX_TAG_LENGTH = 20;
 
@@ -396,7 +396,7 @@ export default function SuggestGame() {
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder="example@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1"
