@@ -33,6 +33,35 @@ export async function GET() {
   return NextResponse.json({ message: 'GitHub webhook endpoint is active' });
 }
 
+// Trigger Vercel redeployment
+async function triggerVercelRedeployment() {
+  try {
+    // Check if we have a deployment hook URL
+    if (!process.env.VERCEL_DEPLOY_HOOK_URL) {
+      console.log('No VERCEL_DEPLOY_HOOK_URL configured, skipping redeployment');
+      return false;
+    }
+    
+    console.log('Triggering Vercel redeployment...');
+    
+    // Call the Vercel deployment hook
+    const response = await fetch(process.env.VERCEL_DEPLOY_HOOK_URL, {
+      method: 'POST',
+    });
+    
+    if (response.ok) {
+      console.log('Vercel redeployment triggered successfully');
+      return true;
+    } else {
+      console.error('Failed to trigger Vercel redeployment:', await response.text());
+      return false;
+    }
+  } catch (error) {
+    console.error('Error triggering Vercel redeployment:', error);
+    return false;
+  }
+}
+
 export async function POST(request: Request) {
   try {
     console.log('Webhook received at /webhook:', new Date().toISOString());
@@ -180,6 +209,9 @@ export async function POST(request: Request) {
           validTags
         );
         console.log('Game added to MongoDB:', added);
+        
+        // Trigger a redeployment to reflect the new game
+        await triggerVercelRedeployment();
         
         // Send notification if contact info is available
         if (hasContactInfo && added) {

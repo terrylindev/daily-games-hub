@@ -15,6 +15,9 @@ export function generateStaticParams() {
   }));
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0; // Disable static generation completely
+
 export default async function CategoryPage({ params }: PageProps) {
   // Await the params since they're now a Promise
   const { id: categoryId } = await params;

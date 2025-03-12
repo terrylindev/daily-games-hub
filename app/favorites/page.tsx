@@ -23,10 +23,13 @@ export default function FavoritesPage() {
         }
 
         // Fetch favorite games from API
-        const response = await fetch("/api/favorites", {
+        const response = await fetch(`/api/favorites?t=${Date.now()}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
           },
           body: JSON.stringify({ favoriteIds }),
         });

@@ -10,7 +10,7 @@ import {
 
 // This makes the page dynamic so it fetches fresh data on each request
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 0; // Disable static generation completely
 
 export default async function Home() {
   // Fetch all games from MongoDB
@@ -21,6 +21,9 @@ export default async function Home() {
   const popularGames = [...games]
     .sort((a, b) => b.popularity - a.popularity)
     .slice(0, 12);
+
+  // Log the number of games for debugging
+  console.log(`Rendering home page with ${games.length} total games`);
 
   return (
     <div className="space-y-8">

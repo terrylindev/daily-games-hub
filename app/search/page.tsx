@@ -11,7 +11,7 @@ type PageProps = {
 
 // Make the page dynamic
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 0; // Disable static generation completely
 
 export default async function SearchPage({ searchParams }: PageProps) {
   const { q: query = "" } = await searchParams;
