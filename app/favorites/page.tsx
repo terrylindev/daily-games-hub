@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Game } from "@/lib/games-data";
 import GamesGrid from "@/components/games-grid";
-import { getFavoriteGamesFromDB } from "@/lib/game-utils";
 
 export default function FavoritesPage() {
   const [favoriteGames, setFavoriteGames] = useState<Game[]>([]);
@@ -23,11 +22,21 @@ export default function FavoritesPage() {
           return;
         }
 
-        // Fetch favorite games from MongoDB
-        const mongoGames = await getFavoriteGamesFromDB(favoriteIds);
-        const games = mongoGames.map((game) => game as unknown as Game);
+        // Fetch favorite games from API
+        const response = await fetch("/api/favorites", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ favoriteIds }),
+        });
 
-        setFavoriteGames(games);
+        if (!response.ok) {
+          throw new Error("Failed to fetch favorite games");
+        }
+
+        const data = await response.json();
+        setFavoriteGames(data.games);
       } catch (error) {
         console.error("Error loading favorites:", error);
       } finally {
