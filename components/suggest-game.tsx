@@ -40,6 +40,12 @@ export default function SuggestGame() {
   const [errorMessage, setErrorMessage] = useState("");
   const [issueUrl, setIssueUrl] = useState("");
   const [tagInputRef, setTagInputRef] = useState<HTMLInputElement | null>(null);
+  const [isCheckingExists, setIsCheckingExists] = useState(false);
+  const [existingGameData, setExistingGameData] = useState<null | {
+    name: string;
+    url: string;
+    status?: string;
+  }>(null);
 
   // Maximum description length
   const MAX_DESCRIPTION_LENGTH = 100;
@@ -115,8 +121,80 @@ export default function SuggestGame() {
     }
   };
 
+  // Add a function to check if a game already exists
+  const checkGameExists = async (
+    name: string,
+    url: string
+  ): Promise<boolean> => {
+    if (!name && !url) return false;
+
+    setIsCheckingExists(true);
+    try {
+      const response = await fetch("/api/check-game-exists", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, url }),
+      });
+
+      const data = await response.json();
+
+      if (data.exists) {
+        // Store the existing game data for display
+        setExistingGameData(data.existingGame || data.pendingGame);
+        return true;
+      }
+
+      setExistingGameData(null);
+      return false;
+    } catch (error) {
+      console.error("Error checking if game exists:", error);
+      return false;
+    } finally {
+      setIsCheckingExists(false);
+    }
+  };
+
+  // Update the name and URL change handlers to check for existing games
+  const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setGameName(value);
+
+    // Only check if the name is at least 3 characters long
+    if (value.length >= 3) {
+      await checkGameExists(value, "");
+    } else {
+      setExistingGameData(null);
+    }
+  };
+
+  const handleUrlChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setGameUrl(value);
+
+    // Only check if the URL is at least 10 characters long (to avoid unnecessary checks)
+    if (value.length >= 10) {
+      await checkGameExists("", value);
+    } else if (!gameName) {
+      setExistingGameData(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if the game already exists before submitting
+    const exists = await checkGameExists(gameName, gameUrl);
+    if (exists) {
+      setErrorMessage(
+        `A game with this ${
+          existingGameData?.name ? "name" : "URL"
+        } already exists.`
+      );
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage("");
 
@@ -192,6 +270,8 @@ export default function SuggestGame() {
           setEmail("");
           setErrorMessage("");
           setIssueUrl("");
+          setExistingGameData(null);
+          setIsCheckingExists(false);
         }
       }}
     >
@@ -244,6 +324,18 @@ export default function SuggestGame() {
               </div>
             )}
 
+            {existingGameData && (
+              <div className="p-2 text-sm bg-amber-50 text-amber-700 rounded-md">
+                <p className="font-medium">Similar game already exists:</p>
+                <p>{existingGameData.name}</p>
+                {existingGameData.status && (
+                  <p className="text-xs mt-1">
+                    Status: {existingGameData.status}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Basic Info Section */}
             <div className="space-y-3">
               <div>
@@ -254,9 +346,13 @@ export default function SuggestGame() {
                   id="game-name"
                   placeholder="Enter the game's name"
                   value={gameName}
-                  onChange={(e) => setGameName(e.target.value)}
+                  onChange={handleNameChange}
                   required
-                  className="mt-1"
+                  className={`mt-1 ${
+                    existingGameData?.name === gameName
+                      ? "border-amber-500"
+                      : ""
+                  }`}
                 />
               </div>
 
@@ -269,10 +365,17 @@ export default function SuggestGame() {
                   type="url"
                   placeholder="https://example.com"
                   value={gameUrl}
-                  onChange={(e) => setGameUrl(e.target.value)}
+                  onChange={handleUrlChange}
                   required
-                  className="mt-1"
+                  className={`mt-1 ${
+                    existingGameData?.url === gameUrl ? "border-amber-500" : ""
+                  }`}
                 />
+                {isCheckingExists && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Checking if game exists...
+                  </p>
+                )}
               </div>
 
               <div>
@@ -420,7 +523,9 @@ export default function SuggestGame() {
                   !gameUrl.trim() ||
                   !gameDescription.trim() ||
                   !gameCategory ||
-                  isSubmitting
+                  isSubmitting ||
+                  isCheckingExists ||
+                  !!existingGameData
                 }
                 size="sm"
               >

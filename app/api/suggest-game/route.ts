@@ -1,108 +1,98 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { Octokit } from '@octokit/rest';
-import { storeContactEmail } from '@/lib/db';
+import { storeContactEmail, addPendingGameSuggestion } from '@/lib/db';
+import { Game } from '@/lib/games-data';
 
 // Initialize Octokit with GitHub token
 const octokit = process.env.GITHUB_TOKEN 
   ? new Octokit({ auth: process.env.GITHUB_TOKEN })
   : null;
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    // Parse the request body
-    const body = await request.json();
-    const { name, url, description, category, categoryName, tags = [], email } = body;
+    if (!octokit) {
+      return NextResponse.json(
+        { error: 'GitHub token not configured' },
+        { status: 500 }
+      );
+    }
+    
+    // Get form data
+    const data = await request.json();
+    const { name, url, category, description, tags, email } = data;
     
     // Validate required fields
-    if (!name || !url || !description || !category) {
+    if (!name || !url || !category || !description) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
     
-    // Validate description length (max 100 characters)
-    if (description.length > 100) {
-      return NextResponse.json(
-        { error: 'Description is too long (max 100 characters)' },
-        { status: 400 }
+    // Create issue body
+    const issueBody = `
+**Name:** ${name}
+**URL:** ${url}
+**Category:** ${category}
+**Tags:** ${tags || ''}
+
+**Description:**
+${description}
+`;
+    
+    try {
+      // Create GitHub issue
+      const response = await octokit.issues.create({
+        owner: process.env.GITHUB_REPO_OWNER || 'owner',
+        repo: process.env.GITHUB_REPO_NAME || 'repo',
+        title: `Game Suggestion: ${name}`,
+        body: issueBody,
+        labels: email ? ['game-suggestion', 'has-contact-info'] : ['game-suggestion']
+      });
+      
+      console.log('GitHub issue created:', response.data.number);
+      
+      // If email is provided, save it to the database
+      if (email) {
+        await storeContactEmail(response.data.number, email);
+      }
+      
+      // Create a game object for the pending suggestion
+      const gameData: Game = {
+        id: name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        name,
+        description: description.trim().slice(0, 100),
+        url,
+        category,
+        tags: tags ? tags.split(',').map((tag: string) => tag.trim().toLowerCase()) : [],
+        popularity: 1,
+        createdAt: new Date()
+      };
+      
+      // Add to pending games collection
+      await addPendingGameSuggestion(
+        response.data.number,
+        gameData,
+        email
       );
-    }
-    
-    // Ensure all tags are lowercase
-    const lowerTags = tags.map((tag: string) => tag.toLowerCase());
-    
-    // Validate tag length (min 2, max 20 characters)
-    const validLengthTags = lowerTags.filter((tag: string) => 
-      tag.length >= 2 && tag.length <= 20
-    );
-    
-    if (validLengthTags.length !== lowerTags.length) {
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Game suggestion submitted successfully',
+        issueNumber: response.data.number,
+        issueUrl: response.data.html_url
+      });
+    } catch (error) {
+      console.error('Error creating GitHub issue:', error);
       return NextResponse.json(
-        { error: 'Tags must be between 2 and 20 characters' },
-        { status: 400 }
-      );
-    }
-    
-    // Validate tags (ensure they're not the same as the category)
-    const validTags = validLengthTags.filter((tag: string) => tag !== category);
-    
-    // Ensure we have no more than 3 tags
-    if (validTags.length > 3) {
-      return NextResponse.json(
-        { error: 'Maximum 3 tags allowed' },
-        { status: 400 }
-      );
-    }
-    
-    // If GitHub token is not configured, return a helpful error
-    if (!octokit) {
-      console.error('GitHub token not configured');
-      return NextResponse.json(
-        { error: 'Server configuration error. Please try again later or submit directly on GitHub.' },
+        { error: error instanceof Error ? error.message : 'Failed to create GitHub issue' },
         { status: 500 }
       );
     }
-    
-    // Create GitHub issue
-    const issueResponse = await octokit.issues.create({
-      owner: 'liny18',
-      repo: 'daily-games-hub',
-      title: `Game Suggestion: ${name}`,
-      body: `## Game Suggestion\n\n` +
-        `**Name:** ${name}\n\n` +
-        `**URL:** ${url}\n\n` +
-        `**Category:** ${categoryName || category}\n\n` +
-        (validTags.length > 0 ? `**Tags:** ${validTags.join(', ')}\n\n` : '') +
-        `**Description:**\n${description}\n\n` +
-        `---\n*Submitted via Daily Games Hub suggestion form*`
-    });
-    
-    // If email is provided, store it securely in the database
-    if (email) {
-      // Add a label to indicate contact info is available
-      await octokit.issues.addLabels({
-        owner: 'liny18',
-        repo: 'daily-games-hub',
-        issue_number: issueResponse.data.number,
-        labels: ['has-contact-info']
-      });
-      
-      // Store the email in the database
-      await storeContactEmail(issueResponse.data.number, email);
-    }
-    
-    // Return success response with issue URL
-    return NextResponse.json({
-      success: true,
-      message: 'Suggestion submitted successfully',
-      issueUrl: issueResponse.data.html_url
-    });
-    
   } catch (error) {
-    console.error('Error creating GitHub issue:', error);
+    console.error('Error processing game suggestion:', error);
     return NextResponse.json(
-      { error: 'Failed to submit suggestion. Please try again later.' },
+      { error: error instanceof Error ? error.message : 'Failed to process game suggestion' },
       { status: 500 }
     );
   }

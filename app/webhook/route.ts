@@ -3,7 +3,12 @@ import { Octokit } from '@octokit/rest';
 import crypto from 'crypto';
 import { sendNotification } from '@/lib/email-utils';
 import { addGameToDataFile } from '@/lib/game-utils';
-import { getContactEmail, deleteContactEmail } from '@/lib/db';
+import { 
+  getContactEmail, 
+  deleteContactEmail, 
+  getPendingGameByIssueNumber,
+  updatePendingGameStatus
+} from '@/lib/db';
 
 // Initialize Octokit with GitHub token
 const octokit = process.env.GITHUB_TOKEN 
@@ -199,16 +204,37 @@ export async function POST(request: Request) {
     if (isCompleted && gameName && gameUrl && gameCategory && gameDescription) {
       console.log('Processing completed game suggestion');
       
-      // Add the game to MongoDB
       try {
+        // Get the pending game from the database
+        const pendingGame = await getPendingGameByIssueNumber(data.issue.number);
+        console.log('Found pending game:', pendingGame ? 'yes' : 'no');
+        
+        // Use the game data from the pending game if available, otherwise use the data from the issue
+        const gameToAdd = pendingGame?.gameData || {
+          id: gameName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+          name: gameName,
+          description: gameDescription.trim().slice(0, 100),
+          url: gameUrl,
+          category: gameCategory,
+          tags: validTags.length > 0 ? validTags : [gameCategory],
+          popularity: 1,
+          createdAt: new Date()
+        };
+        
+        // Add the game to MongoDB
         const added = await addGameToDataFile(
-          gameName, 
-          gameUrl, 
-          gameDescription, 
-          gameCategory,
-          validTags
+          gameToAdd.name, 
+          gameToAdd.url, 
+          gameToAdd.description, 
+          gameToAdd.category,
+          gameToAdd.tags
         );
         console.log('Game added to MongoDB:', added);
+        
+        // Update the pending game status
+        if (pendingGame) {
+          await updatePendingGameStatus(data.issue.number, 'approved');
+        }
         
         // Trigger a redeployment to reflect the new game
         // Always trigger redeployment even if the game already exists
@@ -218,8 +244,8 @@ export async function POST(request: Request) {
         // Send email even if the game already exists (added is false)
         if (hasContactInfo) {
           try {
-            // Get the email from the database
-            const email = await getContactEmail(data.issue.number);
+            // Get the email from the database or from the pending game
+            const email = pendingGame?.contactEmail || await getContactEmail(data.issue.number);
             console.log('Retrieved contact email:', email);
             
             if (email) {
@@ -228,18 +254,18 @@ export async function POST(request: Request) {
                 const status = added ? 'added' : 'updated';
                 const emailSent = await sendNotification(
                   email,
-                  gameName, 
+                  gameToAdd.name, 
                   status
                 );
                 console.log(`Notification email sent (${status}):`, emailSent);
                 
                 // Delete the contact email after it's been used
-                if (emailSent) {
+                if (emailSent && !pendingGame?.contactEmail) {
                   const deleted = await deleteContactEmail(data.issue.number);
                   console.log('Contact email deleted:', deleted);
                 }
                 
-                console.log(`Sent '${status}' notification to ${email} for game "${gameName}"`);
+                console.log(`Sent '${status}' notification to ${email} for game "${gameToAdd.name}"`);
               } catch (error) {
                 console.error('Error sending notification:', error);
               }
@@ -255,7 +281,7 @@ export async function POST(request: Request) {
         
         return NextResponse.json({ 
           message: added ? 'Game added successfully' : 'Game already exists',
-          game: { name: gameName, url: gameUrl, category: gameCategory }
+          game: { name: gameToAdd.name, url: gameToAdd.url, category: gameToAdd.category }
         });
       } catch (error) {
         console.error('Error adding game to MongoDB:', error);
@@ -276,8 +302,17 @@ export async function POST(request: Request) {
       console.log('Processing rejected game suggestion');
       
       try {
-        // Get the email from the database
-        const email = await getContactEmail(data.issue.number);
+        // Get the pending game from the database
+        const pendingGame = await getPendingGameByIssueNumber(data.issue.number);
+        console.log('Found pending game for rejection:', pendingGame ? 'yes' : 'no');
+        
+        // Update the pending game status if it exists
+        if (pendingGame) {
+          await updatePendingGameStatus(data.issue.number, 'rejected', closingComment);
+        }
+        
+        // Get the email from the database or from the pending game
+        const email = pendingGame?.contactEmail || await getContactEmail(data.issue.number);
         console.log('Retrieved contact email for rejected game:', email);
         
         if (email) {
@@ -285,19 +320,19 @@ export async function POST(request: Request) {
             // Send notification email
             const emailSent = await sendNotification(
               email,
-              gameName, 
+              pendingGame?.gameData?.name || gameName, 
               'rejected', 
               closingComment
             );
             console.log('Rejection notification email sent:', emailSent);
             
             // Delete the contact email after it's been used
-            if (emailSent) {
+            if (emailSent && !pendingGame?.contactEmail) {
               const deleted = await deleteContactEmail(data.issue.number);
               console.log('Contact email deleted after rejection:', deleted);
             }
             
-            console.log(`Sent 'rejected' notification to ${email} for game "${gameName}"`);
+            console.log(`Sent 'rejected' notification to ${email} for game "${pendingGame?.gameData?.name || gameName}"`);
           } catch (error) {
             console.error('Error sending rejection notification:', error);
           }
@@ -307,7 +342,7 @@ export async function POST(request: Request) {
         
         return NextResponse.json({ 
           message: 'Rejection notification sent',
-          game: { name: gameName }
+          game: { name: pendingGame?.gameData?.name || gameName }
         });
       } catch (error) {
         console.error('Error processing rejected game:', error);

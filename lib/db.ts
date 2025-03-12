@@ -1,4 +1,5 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
+import { Game } from './games-data';
 
 // MongoDB connection URI (from environment variables)
 const uri = process.env.MONGODB_URI || '';
@@ -116,6 +117,85 @@ export async function deleteContactEmail(issueNumber: number) {
     return true;
   } catch (error) {
     console.error(`Failed to delete contact email for issue #${issueNumber}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Add a game to the pending suggestions collection
+ */
+export async function addPendingGameSuggestion(
+  issueNumber: number,
+  gameData: Game,
+  contactEmail?: string
+): Promise<boolean> {
+  try {
+    console.log(`Adding game "${gameData.name}" to pending suggestions`);
+    
+    const { db } = await connectToDatabase();
+    const collection = db.collection('pending_games');
+    
+    // Create a pending game object with issue number and timestamp
+    const pendingGame = {
+      issueNumber,
+      gameData,
+      contactEmail,
+      createdAt: new Date(),
+      status: 'pending' // pending, approved, rejected
+    };
+    
+    // Insert the pending game into MongoDB
+    const result = await collection.insertOne(pendingGame);
+    console.log(`Game "${gameData.name}" added to pending suggestions, insertedId:`, result.insertedId);
+    
+    return true;
+  } catch (error) {
+    console.error('Error adding game to pending suggestions:', error);
+    return false;
+  }
+}
+
+/**
+ * Get a pending game suggestion by issue number
+ */
+export async function getPendingGameByIssueNumber(issueNumber: number) {
+  try {
+    const { db } = await connectToDatabase();
+    const collection = db.collection('pending_games');
+    
+    return await collection.findOne({ issueNumber });
+  } catch (error) {
+    console.error(`Error getting pending game for issue #${issueNumber}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Update the status of a pending game suggestion
+ */
+export async function updatePendingGameStatus(
+  issueNumber: number,
+  status: 'approved' | 'rejected',
+  comment?: string
+): Promise<boolean> {
+  try {
+    const { db } = await connectToDatabase();
+    const collection = db.collection('pending_games');
+    
+    const result = await collection.updateOne(
+      { issueNumber },
+      { 
+        $set: { 
+          status,
+          processedAt: new Date(),
+          comment
+        } 
+      }
+    );
+    
+    return result.modifiedCount > 0;
+  } catch (error) {
+    console.error(`Error updating pending game status for issue #${issueNumber}:`, error);
     return false;
   }
 }
