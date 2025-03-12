@@ -958,6 +958,15 @@ export const games: Game[] = [
     tags: ["logic", "numbers"],
     popularity: 3,
   },
+  {
+    id: "movie-timeliner",
+    name: "Movie Timeliner",
+    description: "",
+    url: "https://www.movietimeliner.com",
+    category: "movies",
+    tags: ["posters", "sorting"],
+    popularity: 3,
+  }
 ];
 
 // Helper function to get games by category

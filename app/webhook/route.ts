@@ -48,6 +48,7 @@ export async function POST(request: Request) {
     // Verify GitHub webhook signature
     const payload = await request.text();
     console.log('Payload length:', payload.length);
+    console.log('Payload content:', payload.substring(0, 500) + '...');
     
     const signature = request.headers.get('x-hub-signature-256') || '';
     
@@ -58,6 +59,8 @@ export async function POST(request: Request) {
     
     if (!verifySignature(payload, signature)) {
       console.error('Invalid signature for webhook');
+      console.error('Expected signature for payload:', crypto.createHmac('sha256', process.env.GITHUB_WEBHOOK_SECRET).update(payload).digest('hex'));
+      console.error('Received signature:', signature);
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
     
@@ -83,21 +86,40 @@ export async function POST(request: Request) {
     // Check if this is a game suggestion issue
     const issueTitle = data.issue.title || '';
     if (!issueTitle.startsWith('Game Suggestion:')) {
+      console.log('Not a game suggestion issue, title was:', issueTitle);
       return NextResponse.json({ message: 'Not a game suggestion issue' });
     }
     
     // Extract game details from the issue body
     const issueBody = data.issue.body || '';
+    console.log('Issue body:', issueBody);
+    
     const nameMatch = issueBody.match(/\*\*Name:\*\* (.*?)(\n|$)/);
     const urlMatch = issueBody.match(/\*\*URL:\*\* (.*?)(\n|$)/);
     const categoryMatch = issueBody.match(/\*\*Category:\*\* (.*?)(\n|$)/);
     const descriptionMatch = issueBody.match(/\*\*Description:\*\*\n([\s\S]*?)(\n\n|$)/);
     const tags = extractTags(issueBody);
     
+    console.log('Extracted matches:', { 
+      nameMatch: nameMatch ? nameMatch[1] : null,
+      urlMatch: urlMatch ? urlMatch[1] : null,
+      categoryMatch: categoryMatch ? categoryMatch[1] : null,
+      descriptionMatch: descriptionMatch ? descriptionMatch[1] : null,
+      tags
+    });
+    
     const gameName = nameMatch ? nameMatch[1].trim() : '';
     const gameUrl = urlMatch ? urlMatch[1].trim() : '';
     const gameCategory = categoryMatch ? categoryMatch[1].trim().toLowerCase().split(' ')[0] : '';
     const gameDescription = descriptionMatch ? descriptionMatch[1].trim() : '';
+    
+    console.log('Extracted game details:', {
+      gameName,
+      gameUrl,
+      gameCategory,
+      gameDescription,
+      tags
+    });
     
     // Filter out any tags that match the category (redundant)
     const validTags = tags.filter((tag: string) => tag !== gameCategory);
@@ -106,6 +128,7 @@ export async function POST(request: Request) {
     const hasContactInfo = data.issue.labels?.some((label: { name?: string }) => 
       label.name?.toLowerCase() === 'has-contact-info'
     );
+    console.log('Has contact info label:', hasContactInfo);
     
     // Check the close reason (instead of looking for labels)
     const closeReason = data.issue.state_reason || '';
@@ -113,94 +136,151 @@ export async function POST(request: Request) {
     
     // Check if the issue was closed as "completed"
     const isCompleted = closeReason.toLowerCase() === 'completed';
+    console.log('Is completed:', isCompleted);
     
     // Check if the issue was closed as "not planned"
     const isRejected = closeReason.toLowerCase() === 'not_planned';
+    console.log('Is rejected:', isRejected);
     
     // Get the closing comment if any
     let closingComment = '';
     if (data.issue.comments > 0 && octokit) {
-      const commentsResponse = await octokit.issues.listComments({
-        owner: data.repository.owner.login,
-        repo: data.repository.name,
-        issue_number: data.issue.number,
-        per_page: 1,
-        sort: 'created',
-        direction: 'desc'
-      });
-      
-      if (commentsResponse.data.length > 0) {
-        closingComment = commentsResponse.data[0].body || '';
+      try {
+        const commentsResponse = await octokit.issues.listComments({
+          owner: data.repository.owner.login,
+          repo: data.repository.name,
+          issue_number: data.issue.number,
+          per_page: 1,
+          sort: 'created',
+          direction: 'desc'
+        });
+        
+        if (commentsResponse.data.length > 0) {
+          closingComment = commentsResponse.data[0].body || '';
+          console.log('Found closing comment:', closingComment);
+        } else {
+          console.log('No closing comments found');
+        }
+      } catch (error) {
+        console.error('Error fetching comments:', error);
       }
     }
     
     // Handle completed/approved suggestions
     if (isCompleted && gameName && gameUrl && gameCategory && gameDescription) {
+      console.log('Processing completed game suggestion');
+      
       // Add the game to the data file
-      const added = await addGameToDataFile(
-        gameName, 
-        gameUrl, 
-        gameDescription, 
-        gameCategory,
-        validTags
-      );
-      
-      // Send notification if contact info is available
-      if (hasContactInfo && added) {
-        // Get the email from the database
-        const email = await getContactEmail(data.issue.number);
+      try {
+        const added = await addGameToDataFile(
+          gameName, 
+          gameUrl, 
+          gameDescription, 
+          gameCategory,
+          validTags
+        );
+        console.log('Game added to data file:', added);
         
-        if (email) {
-          // Send notification email
-          await sendNotification(
-            email,
-            gameName, 
-            'added'
-          );
-          
-          // Delete the contact email after it's been used
-          await deleteContactEmail(data.issue.number);
-          
-          console.log(`Sent 'added' notification to ${email} for game "${gameName}"`);
+        // Send notification if contact info is available
+        if (hasContactInfo && added) {
+          try {
+            // Get the email from the database
+            const email = await getContactEmail(data.issue.number);
+            console.log('Retrieved contact email:', email);
+            
+            if (email) {
+              try {
+                // Send notification email
+                const emailSent = await sendNotification(
+                  email,
+                  gameName, 
+                  'added'
+                );
+                console.log('Notification email sent:', emailSent);
+                
+                // Delete the contact email after it's been used
+                if (emailSent) {
+                  const deleted = await deleteContactEmail(data.issue.number);
+                  console.log('Contact email deleted:', deleted);
+                }
+                
+                console.log(`Sent 'added' notification to ${email} for game "${gameName}"`);
+              } catch (error) {
+                console.error('Error sending notification:', error);
+              }
+            } else {
+              console.log(`No email found for issue #${data.issue.number}`);
+            }
+          } catch (error) {
+            console.error('Error processing contact email:', error);
+          }
         } else {
-          console.log(`No email found for issue #${data.issue.number}`);
+          console.log('No contact info available or game not added successfully');
         }
+        
+        return NextResponse.json({ 
+          message: 'Game added successfully',
+          game: { name: gameName, url: gameUrl, category: gameCategory }
+        });
+      } catch (error) {
+        console.error('Error adding game to data file:', error);
+        return NextResponse.json({ error: 'Failed to add game to data file' }, { status: 500 });
       }
-      
-      return NextResponse.json({ 
-        message: 'Game added successfully',
-        game: { name: gameName, url: gameUrl, category: gameCategory }
-      });
+    } else {
+      console.log('Not processing as completed game suggestion because:',
+        !isCompleted ? 'Not marked as completed' : '',
+        !gameName ? 'Missing game name' : '',
+        !gameUrl ? 'Missing game URL' : '',
+        !gameCategory ? 'Missing game category' : '',
+        !gameDescription ? 'Missing game description' : ''
+      );
     }
     
     // Handle rejected suggestions
     if (isRejected && hasContactInfo) {
-      // Get the email from the database
-      const email = await getContactEmail(data.issue.number);
+      console.log('Processing rejected game suggestion');
       
-      if (email) {
-        // Send notification email
-        await sendNotification(
-          email,
-          gameName, 
-          'rejected', 
-          closingComment
-        );
+      try {
+        // Get the email from the database
+        const email = await getContactEmail(data.issue.number);
+        console.log('Retrieved contact email for rejected game:', email);
         
-        // Delete the contact email after it's been used
-        await deleteContactEmail(data.issue.number);
+        if (email) {
+          try {
+            // Send notification email
+            const emailSent = await sendNotification(
+              email,
+              gameName, 
+              'rejected', 
+              closingComment
+            );
+            console.log('Rejection notification email sent:', emailSent);
+            
+            // Delete the contact email after it's been used
+            if (emailSent) {
+              const deleted = await deleteContactEmail(data.issue.number);
+              console.log('Contact email deleted after rejection:', deleted);
+            }
+            
+            console.log(`Sent 'rejected' notification to ${email} for game "${gameName}"`);
+          } catch (error) {
+            console.error('Error sending rejection notification:', error);
+          }
+        } else {
+          console.log(`No email found for rejected issue #${data.issue.number}`);
+        }
         
-        console.log(`Sent 'rejected' notification to ${email} for game "${gameName}"`);
-      } else {
-        console.log(`No email found for issue #${data.issue.number}`);
+        return NextResponse.json({ 
+          message: 'Rejection notification sent',
+          game: { name: gameName }
+        });
+      } catch (error) {
+        console.error('Error processing rejected game:', error);
+        return NextResponse.json({ error: 'Failed to process rejected game' }, { status: 500 });
       }
-      
-      return NextResponse.json({ 
-        message: 'Rejection notification sent',
-        game: { name: gameName }
-      });
     }
     
+    console.log('No action taken for this webhook');
     return NextResponse.json({ message: 'No action taken' });
     
   } catch (error) {

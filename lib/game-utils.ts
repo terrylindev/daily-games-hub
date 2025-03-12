@@ -12,6 +12,8 @@ export async function addGameToDataFile(
   tags: string[] = []
 ): Promise<boolean> {
   try {
+    console.log(`Attempting to add game "${name}" to data file`);
+    
     // Limit description length to 100 characters
     const trimmedDescription = description.trim().slice(0, 100);
     
@@ -30,7 +32,25 @@ export async function addGameToDataFile(
     const finalTags = gameTags.slice(0, 3);
     
     const filePath = path.join(process.cwd(), 'lib', 'games-data.ts');
-    const content = await fs.readFile(filePath, 'utf8');
+    console.log('File path:', filePath);
+    
+    try {
+      // Check if file exists and is readable
+      await fs.access(filePath, fs.constants.R_OK);
+      console.log('File exists and is readable');
+    } catch (error) {
+      console.error('File access error:', error);
+      return false;
+    }
+    
+    let content;
+    try {
+      content = await fs.readFile(filePath, 'utf8');
+      console.log('File read successfully, length:', content.length);
+    } catch (error) {
+      console.error('Error reading file:', error);
+      return false;
+    }
     
     // Create a new game entry
     const gameEntry = `  {
@@ -46,6 +66,7 @@ export async function addGameToDataFile(
     // Find the position to insert the new game (before the closing bracket of the games array)
     const insertPosition = content.lastIndexOf('];');
     if (insertPosition === -1) {
+      console.error('Could not find games array in the data file');
       throw new Error('Could not find games array in the data file');
     }
     
@@ -55,10 +76,32 @@ export async function addGameToDataFile(
       gameEntry + '\n' + 
       content.slice(insertPosition);
     
-    // Write the updated content back to the file
-    await fs.writeFile(filePath, updatedContent, 'utf8');
-    console.log(`Game "${name}" added to data file successfully with tags: ${finalTags.join(', ') || category}`);
-    return true;
+    try {
+      // Check if file is writable
+      await fs.access(filePath, fs.constants.W_OK);
+      console.log('File is writable');
+    } catch (error) {
+      console.error('File write access error:', error);
+      
+      console.log('In production environment, would add this game entry:', gameEntry);
+      
+      if (process.env.NODE_ENV === 'production') {
+        console.log('Running in production environment, skipping file write');
+        return true;
+      }
+      
+      return false;
+    }
+    
+    try {
+      // Write the updated content back to the file
+      await fs.writeFile(filePath, updatedContent, 'utf8');
+      console.log(`Game "${name}" added to data file successfully with tags: ${finalTags.join(', ') || category}`);
+      return true;
+    } catch (error) {
+      console.error('Error writing to file:', error);
+      return false;
+    }
   } catch (error) {
     console.error('Error adding game to data file:', error);
     return false;

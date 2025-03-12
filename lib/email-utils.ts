@@ -20,7 +20,7 @@ export async function sendNotification(
   console.log(`Attempting to send ${status} notification to ${email} for game "${gameName}"`);
   
   if (!resend) {
-    console.error('Resend API key not configured');
+    console.error('Resend API key not configured:', process.env.RESEND_API_KEY ? 'Key exists but may be invalid' : 'Key is missing');
     return false;
   }
   
@@ -39,20 +39,25 @@ export async function sendNotification(
       subject
     });
     
-    const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'Daily Games Hub <onboarding@resend.dev>',
-      to: email,
-      subject,
-      text
-    });
-    
-    if (error) {
-      console.error('Error sending email via Resend:', error);
+    try {
+      const { data, error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'Daily Games Hub <onboarding@resend.dev>',
+        to: email,
+        subject,
+        text
+      });
+      
+      if (error) {
+        console.error('Error sending email via Resend:', error);
+        return false;
+      }
+      
+      console.log('Email sent successfully:', data);
+      return true;
+    } catch (sendError) {
+      console.error('Exception during Resend API call:', sendError);
       return false;
     }
-    
-    console.log('Email sent successfully:', data);
-    return true;
   } catch (error) {
     console.error('Error sending notification email:', error);
     return false;
