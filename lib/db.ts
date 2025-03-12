@@ -23,7 +23,6 @@ let cachedDb: ReturnType<MongoClient['db']> | null = null;
 export async function connectToDatabase() {
   // If we have a cached connection, use it
   if (cachedClient && cachedDb) {
-    console.log('Using cached MongoDB connection');
     return { client: cachedClient, db: cachedDb };
   }
 

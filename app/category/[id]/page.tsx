@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { categories, getGamesByCategory } from "@/lib/games-data";
+import { categories } from "@/lib/games-data";
+import { getGamesByCategory as getGamesByCategoryFromDB } from "@/lib/game-utils";
 import GamesGrid from "@/components/games-grid";
 import CategoryFilter from "@/components/category-filter";
 
@@ -27,7 +28,11 @@ export default async function CategoryPage({ params }: PageProps) {
     notFound();
   }
 
-  const games = getGamesByCategory(category.id);
+  // Use the MongoDB function to get games by category
+  const gamesFromDB = await getGamesByCategoryFromDB(category.id);
+  console.log(
+    `Category page: Retrieved ${gamesFromDB.length} games for category ${category.id}`
+  );
 
   return (
     <div className="space-y-8">
@@ -39,7 +44,7 @@ export default async function CategoryPage({ params }: PageProps) {
       <CategoryFilter />
 
       <Suspense fallback={<div>Loading games...</div>}>
-        <GamesGrid games={games} />
+        <GamesGrid games={gamesFromDB} />
       </Suspense>
     </div>
   );

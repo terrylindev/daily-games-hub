@@ -3,6 +3,23 @@ import { Game } from './games-data';
 import { WithId, Document } from 'mongodb';
 
 /**
+ * Capitalize the first letter of each word in a string
+ */
+export function capitalizeWords(str: string): string {
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+/**
+ * Capitalize the first letter of a string
+ */
+export function capitalizeFirstLetter(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
  * Add a new game to MongoDB
  */
 export async function addGameToDataFile(
@@ -13,10 +30,12 @@ export async function addGameToDataFile(
   tags: string[] = []
 ): Promise<boolean> {
   try {
-    console.log(`Attempting to add game "${name}" to MongoDB`);
+    // Capitalize the first letter of each word in the name
+    const capitalizedName = capitalizeWords(name);
     
-    // Limit description length to 100 characters
+    // Limit description length to 100 characters and capitalize first letter
     const trimmedDescription = description.trim().slice(0, 100);
+    const capitalizedDescription = capitalizeFirstLetter(trimmedDescription);
     
     // Ensure all tags are lowercase
     const lowerTags = tags.map(tag => tag.toLowerCase());
@@ -32,14 +51,17 @@ export async function addGameToDataFile(
     // Limit to 3 tags maximum
     const finalTags = gameTags.slice(0, 3);
     
+    // Ensure there's at least one tag (use category as fallback)
+    const tagsToUse = finalTags.length > 0 ? finalTags : [category];
+    
     // Create a game object
     const gameData: Game = {
       id: name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-      name: name,
-      description: trimmedDescription,
+      name: capitalizedName,
+      description: capitalizedDescription,
       url: url,
       category: category,
-      tags: finalTags.length > 0 ? finalTags : [category],
+      tags: tagsToUse,
       popularity: 1,
       createdAt: new Date()
     };
@@ -51,14 +73,11 @@ export async function addGameToDataFile(
     // Check if a game with this ID already exists
     const existingGame = await collection.findOne({ id: gameData.id });
     if (existingGame) {
-      console.log(`Game with ID "${gameData.id}" already exists in MongoDB`);
       return false;
     }
     
     // Insert the game into MongoDB
-    const result = await collection.insertOne(gameData);
-    console.log(`Game "${name}" added to MongoDB, insertedId:`, result.insertedId);
-    
+    await collection.insertOne(gameData);
     return true;
   } catch (error) {
     console.error('Error adding game to MongoDB:', error);
@@ -107,6 +126,7 @@ export async function getGamesByCategory(categoryId: string) {
     const { db } = await connectToDatabase();
     const collection = db.collection('games');
     
+    // Get games for this category
     const games = await collection
       .find({ category: categoryId })
       .sort({ popularity: -1 })
@@ -127,24 +147,20 @@ export async function searchGames(query: string) {
     const { db } = await connectToDatabase();
     const collection = db.collection('games');
     
-    // Create a text index if it doesn't exist
-    try {
-      await collection.createIndex({ 
-        name: "text", 
-        description: "text", 
-        tags: "text" 
-      });
-    } catch (indexError) {
-      console.log('Index might already exist:', indexError);
+    // Normalize the search query
+    const normalizedQuery = query.toLowerCase().trim();
+    
+    if (!normalizedQuery) {
+      return [];
     }
     
-    // Perform text search
+    // Perform search using regex instead of text index
     const games = await collection
       .find({
         $or: [
-          { name: { $regex: query, $options: 'i' } },
-          { description: { $regex: query, $options: 'i' } },
-          { tags: { $in: [query.toLowerCase()] } }
+          { name: { $regex: normalizedQuery, $options: 'i' } },
+          { description: { $regex: normalizedQuery, $options: 'i' } },
+          { tags: { $in: [normalizedQuery] } }
         ]
       })
       .sort({ popularity: -1 })

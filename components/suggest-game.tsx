@@ -195,6 +195,12 @@ export default function SuggestGame() {
       return;
     }
 
+    // Require at least one tag
+    if (customTags.length === 0) {
+      setErrorMessage("Please add at least one tag for the game.");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage("");
 
@@ -341,6 +347,7 @@ export default function SuggestGame() {
               <div>
                 <Label htmlFor="game-name" className="text-sm">
                   Game Name
+                  <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="game-name"
@@ -359,6 +366,7 @@ export default function SuggestGame() {
               <div>
                 <Label htmlFor="game-url" className="text-sm">
                   Game URL
+                  <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="game-url"
@@ -381,6 +389,7 @@ export default function SuggestGame() {
               <div>
                 <Label htmlFor="game-category" className="text-sm">
                   Category
+                  <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   value={gameCategory}
@@ -408,7 +417,10 @@ export default function SuggestGame() {
             {/* Custom Tags Section */}
             <div className="pt-1">
               <div className="flex justify-between items-center">
-                <Label className="text-sm">Tags (Up to 3)</Label>
+                <Label className="text-sm">
+                  Tags (Max 3)
+                  <span className="text-red-500">*</span>
+                </Label>
                 <span className="text-xs text-muted-foreground">
                   {customTags.length}/3
                 </span>
@@ -473,6 +485,7 @@ export default function SuggestGame() {
               <div className="flex justify-between items-center">
                 <Label htmlFor="game-description" className="text-sm">
                   Description
+                  <span className="text-red-500">*</span>
                 </Label>
                 <span className="text-xs text-muted-foreground">
                   {gameDescription.length}/{MAX_DESCRIPTION_LENGTH}
@@ -523,6 +536,7 @@ export default function SuggestGame() {
                   !gameUrl.trim() ||
                   !gameDescription.trim() ||
                   !gameCategory ||
+                  customTags.length === 0 ||
                   isSubmitting ||
                   isCheckingExists ||
                   !!existingGameData

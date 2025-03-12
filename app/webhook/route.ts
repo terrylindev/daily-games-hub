@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { Octokit } from '@octokit/rest';
 import crypto from 'crypto';
 import { sendNotification } from '@/lib/email-utils';
-import { addGameToDataFile } from '@/lib/game-utils';
+import { addGameToDataFile, capitalizeWords, capitalizeFirstLetter } from '@/lib/game-utils';
 import { 
   getContactEmail, 
   deleteContactEmail, 
@@ -144,7 +144,14 @@ export async function POST(request: Request) {
     
     const gameName = nameMatch ? nameMatch[1].trim() : '';
     const gameUrl = urlMatch ? urlMatch[1].trim() : '';
-    const gameCategory = categoryMatch ? categoryMatch[1].trim().toLowerCase().split(' ')[0] : '';
+    
+    // Extract category - use the first word of the category text
+    const gameCategory = categoryMatch 
+      ? categoryMatch[1].trim().toLowerCase().split(' ')[0] 
+      : '';
+    
+    console.log(`Extracted category: "${categoryMatch?.[1]}" → "${gameCategory}"`);
+    
     const gameDescription = descriptionMatch ? descriptionMatch[1].trim() : '';
     
     console.log('Extracted game details:', {
@@ -212,8 +219,8 @@ export async function POST(request: Request) {
         // Use the game data from the pending game if available, otherwise use the data from the issue
         const gameToAdd = pendingGame?.gameData || {
           id: gameName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-          name: gameName,
-          description: gameDescription.trim().slice(0, 100),
+          name: capitalizeWords(gameName),
+          description: capitalizeFirstLetter(gameDescription.trim().slice(0, 100)),
           url: gameUrl,
           category: gameCategory,
           tags: validTags.length > 0 ? validTags : [gameCategory],
