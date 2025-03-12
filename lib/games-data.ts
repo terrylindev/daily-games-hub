@@ -6,6 +6,7 @@ export type Game = {
   category: string;
   tags: string[];
   popularity: number; // 1-5 scale for sorting
+  createdAt?: Date; // For backward compatibility
 };
 
 export type Category = {

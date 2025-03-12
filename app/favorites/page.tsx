@@ -1,21 +1,41 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { games } from "@/lib/games-data";
+import { Game } from "@/lib/games-data";
 import GamesGrid from "@/components/games-grid";
+import { getFavoriteGamesFromDB } from "@/lib/game-utils";
 
 export default function FavoritesPage() {
-  const [favoriteGames, setFavoriteGames] = useState<typeof games>([]);
+  const [favoriteGames, setFavoriteGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load favorites from localStorage
-    const favoriteIds = JSON.parse(
-      localStorage.getItem("favoriteGames") || "[]"
-    );
-    const favorites = games.filter((game) => favoriteIds.includes(game.id));
-    setFavoriteGames(favorites);
-    setIsLoading(false);
+    async function loadFavorites() {
+      try {
+        // Load favorites from localStorage
+        const favoriteIds = JSON.parse(
+          localStorage.getItem("favoriteGames") || "[]"
+        );
+
+        if (favoriteIds.length === 0) {
+          setFavoriteGames([]);
+          setIsLoading(false);
+          return;
+        }
+
+        // Fetch favorite games from MongoDB
+        const mongoGames = await getFavoriteGamesFromDB(favoriteIds);
+        const games = mongoGames.map((game) => game as unknown as Game);
+
+        setFavoriteGames(games);
+      } catch (error) {
+        console.error("Error loading favorites:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadFavorites();
   }, []);
 
   return (

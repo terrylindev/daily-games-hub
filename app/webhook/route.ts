@@ -170,7 +170,7 @@ export async function POST(request: Request) {
     if (isCompleted && gameName && gameUrl && gameCategory && gameDescription) {
       console.log('Processing completed game suggestion');
       
-      // Add the game to the data file
+      // Add the game to MongoDB
       try {
         const added = await addGameToDataFile(
           gameName, 
@@ -179,7 +179,7 @@ export async function POST(request: Request) {
           gameCategory,
           validTags
         );
-        console.log('Game added to data file:', added);
+        console.log('Game added to MongoDB:', added);
         
         // Send notification if contact info is available
         if (hasContactInfo && added) {
@@ -223,8 +223,8 @@ export async function POST(request: Request) {
           game: { name: gameName, url: gameUrl, category: gameCategory }
         });
       } catch (error) {
-        console.error('Error adding game to data file:', error);
-        return NextResponse.json({ error: 'Failed to add game to data file' }, { status: 500 });
+        console.error('Error adding game to MongoDB:', error);
+        return NextResponse.json({ error: 'Failed to add game to MongoDB' }, { status: 500 });
       }
     } else {
       console.log('Not processing as completed game suggestion because:',

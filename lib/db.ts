@@ -19,7 +19,7 @@ let cachedDb: ReturnType<MongoClient['db']> | null = null;
 /**
  * Connect to MongoDB and return the database instance
  */
-async function connectToDatabase() {
+export async function connectToDatabase() {
   // If we have a cached connection, use it
   if (cachedClient && cachedDb) {
     console.log('Using cached MongoDB connection');

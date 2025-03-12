@@ -1,10 +1,22 @@
 import { Suspense } from "react";
-import { games, categories, getGamesByCategory } from "@/lib/games-data";
+import { categories, Game } from "@/lib/games-data";
 import CategoryFilter from "@/components/category-filter";
 import SuggestGame from "@/components/suggest-game";
 import ExpandableGamesGrid from "../components/expandable-games-grid";
+import {
+  getGamesFromMongoDB,
+  getGamesByCategory as getGamesByCategoryFromDB,
+} from "@/lib/game-utils";
 
-export default function Home() {
+// This makes the page dynamic so it fetches fresh data on each request
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export default async function Home() {
+  // Fetch all games from MongoDB
+  const mongoGames = await getGamesFromMongoDB();
+  const games = mongoGames.map((game) => game as unknown as Game);
+
   // Get popular games (sorted by popularity)
   const popularGames = [...games]
     .sort((a, b) => b.popularity - a.popularity)
@@ -37,23 +49,43 @@ export default function Home() {
         />
       </Suspense>
 
-      {categories.map((category) => {
-        const categoryGames = getGamesByCategory(category.id);
-        if (categoryGames.length === 0) return null;
-
-        return (
-          <Suspense
-            key={category.id}
-            fallback={<div>Loading {category.name}...</div>}
-          >
-            <ExpandableGamesGrid
-              games={categoryGames}
-              title={category.name}
-              description={category.description}
-            />
-          </Suspense>
-        );
-      })}
+      {categories.map((category) => (
+        <CategorySection
+          key={category.id}
+          categoryId={category.id}
+          title={category.name}
+          description={category.description}
+        />
+      ))}
     </div>
+  );
+}
+
+// Separate component for category sections to allow for independent loading
+async function CategorySection({
+  categoryId,
+  title,
+  description,
+}: {
+  categoryId: string;
+  title: string;
+  description: string;
+}) {
+  // Fetch games for this category directly from MongoDB
+  const categoryGamesFromDB = await getGamesByCategoryFromDB(categoryId);
+  const categoryGames = categoryGamesFromDB.map(
+    (game) => game as unknown as Game
+  );
+
+  if (categoryGames.length === 0) return null;
+
+  return (
+    <Suspense fallback={<div>Loading {title}...</div>}>
+      <ExpandableGamesGrid
+        games={categoryGames}
+        title={title}
+        description={description}
+      />
+    </Suspense>
   );
 }

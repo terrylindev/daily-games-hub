@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { searchGames } from "@/lib/games-data";
+import { Game } from "@/lib/games-data";
+import { searchGames } from "@/lib/game-utils";
 import GamesGrid from "@/components/games-grid";
 import CategoryFilter from "@/components/category-filter";
 
@@ -8,9 +9,16 @@ type PageProps = {
   searchParams: Promise<{ q?: string }>;
 };
 
+// Make the page dynamic
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function SearchPage({ searchParams }: PageProps) {
   const { q: query = "" } = await searchParams;
-  const games = query ? searchGames(query) : [];
+
+  // Use MongoDB search function
+  const mongoGames = query ? await searchGames(query) : [];
+  const games = mongoGames.map((game) => game as unknown as Game);
 
   return (
     <div className="space-y-8">
