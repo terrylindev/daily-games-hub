@@ -211,10 +211,12 @@ export async function POST(request: Request) {
         console.log('Game added to MongoDB:', added);
         
         // Trigger a redeployment to reflect the new game
+        // Always trigger redeployment even if the game already exists
         await triggerVercelRedeployment();
         
         // Send notification if contact info is available
-        if (hasContactInfo && added) {
+        // Send email even if the game already exists (added is false)
+        if (hasContactInfo) {
           try {
             // Get the email from the database
             const email = await getContactEmail(data.issue.number);
@@ -222,13 +224,14 @@ export async function POST(request: Request) {
             
             if (email) {
               try {
-                // Send notification email
+                // Send notification email - use 'updated' status if game already exists
+                const status = added ? 'added' : 'updated';
                 const emailSent = await sendNotification(
                   email,
                   gameName, 
-                  'added'
+                  status
                 );
-                console.log('Notification email sent:', emailSent);
+                console.log(`Notification email sent (${status}):`, emailSent);
                 
                 // Delete the contact email after it's been used
                 if (emailSent) {
@@ -236,7 +239,7 @@ export async function POST(request: Request) {
                   console.log('Contact email deleted:', deleted);
                 }
                 
-                console.log(`Sent 'added' notification to ${email} for game "${gameName}"`);
+                console.log(`Sent '${status}' notification to ${email} for game "${gameName}"`);
               } catch (error) {
                 console.error('Error sending notification:', error);
               }
@@ -247,11 +250,11 @@ export async function POST(request: Request) {
             console.error('Error processing contact email:', error);
           }
         } else {
-          console.log('No contact info available or game not added successfully');
+          console.log('No contact info available');
         }
         
         return NextResponse.json({ 
-          message: 'Game added successfully',
+          message: added ? 'Game added successfully' : 'Game already exists',
           game: { name: gameName, url: gameUrl, category: gameCategory }
         });
       } catch (error) {
