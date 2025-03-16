@@ -198,3 +198,129 @@ export async function updatePendingGameStatus(
     return false;
   }
 }
+
+/**
+ * Get category counts from the database
+ */
+export async function getCategoryCounts() {
+  try {
+    const { db } = await connectToDatabase();
+    const collection = db.collection('category_stats');
+    
+    // Get the latest category stats document
+    const stats = await collection.findOne(
+      { type: 'category_counts' },
+      { sort: { updatedAt: -1 } }
+    );
+    
+    if (stats) {
+      return stats.counts;
+    }
+    
+    // If no stats exist, calculate them and store them
+    return await recalculateCategoryCounts();
+  } catch (error) {
+    console.error('Error getting category counts:', error);
+    return {};
+  }
+}
+
+/**
+ * Recalculate category counts and store them in the database
+ */
+export async function recalculateCategoryCounts() {
+  try {
+    const { db } = await connectToDatabase();
+    const gamesCollection = db.collection('games');
+    const statsCollection = db.collection('category_stats');
+    
+    // Aggregate games by category
+    const aggregationResult = await gamesCollection.aggregate([
+      { $group: { _id: '$category', count: { $sum: 1 } } }
+    ]).toArray();
+    
+    // Convert to a more usable format
+    const counts: Record<string, number> = {};
+    let total = 0;
+    
+    aggregationResult.forEach(result => {
+      counts[result._id] = result.count;
+      total += result.count;
+    });
+    
+    // Add total count
+    counts['total'] = total;
+    
+    // Store the counts in the database
+    await statsCollection.updateOne(
+      { type: 'category_counts' },
+      { 
+        $set: { 
+          counts,
+          updatedAt: new Date()
+        } 
+      },
+      { upsert: true }
+    );
+    
+    return counts;
+  } catch (error) {
+    console.error('Error recalculating category counts:', error);
+    return {};
+  }
+}
+
+/**
+ * Update category counts when a game is added
+ */
+export async function incrementCategoryCount(categoryId: string) {
+  try {
+    const { db } = await connectToDatabase();
+    const collection = db.collection('category_stats');
+    
+    // Update the category count and total count
+    await collection.updateOne(
+      { type: 'category_counts' },
+      { 
+        $inc: { 
+          [`counts.${categoryId}`]: 1,
+          'counts.total': 1
+        },
+        $set: { updatedAt: new Date() }
+      },
+      { upsert: true }
+    );
+    
+    return true;
+  } catch (error) {
+    console.error(`Error incrementing count for category ${categoryId}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Update category counts when a game is removed
+ */
+export async function decrementCategoryCount(categoryId: string) {
+  try {
+    const { db } = await connectToDatabase();
+    const collection = db.collection('category_stats');
+    
+    // Update the category count and total count
+    await collection.updateOne(
+      { type: 'category_counts' },
+      { 
+        $inc: { 
+          [`counts.${categoryId}`]: -1,
+          'counts.total': -1
+        },
+        $set: { updatedAt: new Date() }
+      }
+    );
+    
+    return true;
+  } catch (error) {
+    console.error(`Error decrementing count for category ${categoryId}:`, error);
+    return false;
+  }
+}

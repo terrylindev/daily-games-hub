@@ -1,4 +1,4 @@
-import { connectToDatabase } from './db';
+import { connectToDatabase, incrementCategoryCount } from './db';
 import { Game } from './games-data';
 import { WithId, Document } from 'mongodb';
 
@@ -73,11 +73,17 @@ export async function addGameToDataFile(
     // Check if a game with this ID already exists
     const existingGame = await collection.findOne({ id: gameData.id });
     if (existingGame) {
+      console.log(`Game with ID ${gameData.id} already exists`);
       return false;
     }
     
     // Insert the game into MongoDB
-    await collection.insertOne(gameData);
+    const result = await collection.insertOne(gameData);
+    
+    // Update category counts
+    await incrementCategoryCount(category);
+    
+    console.log(`Game "${gameData.name}" added to MongoDB, insertedId:`, result.insertedId);
     return true;
   } catch (error) {
     console.error('Error adding game to MongoDB:', error);

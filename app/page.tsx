@@ -7,10 +7,20 @@ import {
   getGamesFromMongoDB,
   getGamesByCategory as getGamesByCategoryFromDB,
 } from "@/lib/game-utils";
+import type { Metadata } from "next";
 
 // This makes the page dynamic so it fetches fresh data on each request
 export const dynamic = "force-dynamic";
 export const revalidate = 0; // Disable static generation completely
+
+export const metadata: Metadata = {
+  title: "Daily Games Hub | Your One-Stop Directory for Popular Daily Games",
+  description:
+    "Discover and play the best daily games like Wordle, Connections, TimeGuessr and more. Your curated collection of word puzzles, geography games, and daily challenges.",
+  alternates: {
+    canonical: "/",
+  },
+};
 
 export default async function Home() {
   // Fetch all games from MongoDB

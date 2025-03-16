@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Game } from "@/lib/games-data";
 import GamesGrid from "@/components/games-grid";
+import { BreadcrumbJSONLD } from "@/components/json-ld";
+import Head from "next/head";
 
 export default function FavoritesPage() {
   const [favoriteGames, setFavoriteGames] = useState<Game[]>([]);
@@ -52,6 +54,25 @@ export default function FavoritesPage() {
 
   return (
     <div className="space-y-8">
+      <Head>
+        <title>Your Favorites | Daily Games Hub</title>
+        <meta
+          name="description"
+          content="View and manage your favorite daily games. Quick access to your personalized collection of word puzzles, geography games, and daily challenges."
+        />
+        <meta name="robots" content="noindex, follow" />
+      </Head>
+
+      <BreadcrumbJSONLD
+        items={[
+          { name: "Home", item: "https://dailygameshub.com/" },
+          {
+            name: "Favorites",
+            item: "https://dailygameshub.com/favorites",
+          },
+        ]}
+      />
+
       <section className="py-6">
         <h1 className="text-3xl font-bold tracking-tight">Your Favorites 🌟</h1>
         <p className="mt-2 text-muted-foreground">

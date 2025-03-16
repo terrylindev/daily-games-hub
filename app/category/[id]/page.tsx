@@ -4,6 +4,8 @@ import { categories } from "@/lib/games-data";
 import { getGamesByCategory as getGamesByCategoryFromDB } from "@/lib/game-utils";
 import GamesGrid from "@/components/games-grid";
 import CategoryFilter from "@/components/category-filter";
+import type { Metadata } from "next";
+import { BreadcrumbJSONLD } from "@/components/json-ld";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -18,6 +20,39 @@ export function generateStaticParams() {
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0; // Disable static generation completely
+
+// Generate metadata for each category page
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { id: categoryId } = await params;
+  const category = categories.find((c) => c.id === categoryId);
+
+  if (!category) {
+    return {
+      title: "Category Not Found",
+      description: "The requested category could not be found.",
+    };
+  }
+
+  return {
+    title: `${category.name} Games | Daily Games Hub`,
+    description: `Discover and play the best ${category.name.toLowerCase()} games. ${
+      category.description
+    }`,
+    alternates: {
+      canonical: `/category/${category.id}`,
+    },
+    openGraph: {
+      title: `${category.name} Games | Daily Games Hub`,
+      description: `Discover and play the best ${category.name.toLowerCase()} games. ${
+        category.description
+      }`,
+      url: `https://dailygameshub.com/category/${category.id}`,
+      type: "website",
+    },
+  };
+}
 
 export default async function CategoryPage({ params }: PageProps) {
   // Await the params since they're now a Promise
@@ -36,6 +71,16 @@ export default async function CategoryPage({ params }: PageProps) {
 
   return (
     <div className="space-y-8">
+      <BreadcrumbJSONLD
+        items={[
+          { name: "Home", item: "https://dailygameshub.com/" },
+          {
+            name: category.name,
+            item: `https://dailygameshub.com/category/${category.id}`,
+          },
+        ]}
+      />
+
       <section className="py-6">
         <h1 className="text-3xl font-bold tracking-tight">{category.name}</h1>
         <p className="mt-2 text-muted-foreground">{category.description}</p>

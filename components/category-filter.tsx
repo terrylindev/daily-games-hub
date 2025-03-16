@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { categories, Game } from "@/lib/games-data";
+import { categories } from "@/lib/games-data";
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
 
@@ -24,29 +24,17 @@ export default function CategoryFilter() {
     async function fetchGameCounts() {
       try {
         setIsLoadingCounts(true);
-        const response = await fetch("/api/games");
+        const response = await fetch("/api/category-counts");
         if (response.ok) {
           const data = await response.json();
 
-          // Calculate counts by category
-          const counts: Record<string, number> = {};
-          let total = 0;
-
-          if (data.games && Array.isArray(data.games)) {
-            total = data.games.length;
-
-            // Count games by category
-            data.games.forEach((game: Game) => {
-              const category = game.category || "unknown";
-              counts[category] = (counts[category] || 0) + 1;
-            });
+          if (data.counts) {
+            setCategoryCounts(data.counts);
+            setTotalGames(data.counts.total || 0);
           }
-
-          setCategoryCounts(counts);
-          setTotalGames(total);
         }
       } catch (error) {
-        console.error("Error fetching game counts:", error);
+        console.error("Error fetching category counts:", error);
       } finally {
         setIsLoadingCounts(false);
       }

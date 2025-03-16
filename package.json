@@ -4,9 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "node scripts/generate-og-images.js && node scripts/generate-sitemap.js",
     "build": "next build",
+    "postbuild": "node scripts/submit-sitemap.js",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-og": "node scripts/generate-og-images.js",
+    "generate-sitemap": "node scripts/generate-sitemap.js",
+    "submit-sitemap": "node scripts/submit-sitemap.js",
+    "init-category-counts": "npx tsx scripts/initialize-category-counts.ts"
   },
   "dependencies": {
     "@octokit/rest": "^21.1.1",
@@ -19,6 +25,7 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@types/nodemailer": "^6.4.17",
     "@vercel/analytics": "^1.5.0",
+    "canvas": "^2.11.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.477.0",
