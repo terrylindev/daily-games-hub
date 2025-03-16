@@ -4,15 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "prebuild": "node scripts/generate-og-images.js && node scripts/generate-sitemap.js",
     "build": "next build",
-    "postbuild": "node scripts/submit-sitemap.js",
     "start": "next start",
-    "lint": "next lint",
-    "generate-og": "node scripts/generate-og-images.js",
-    "generate-sitemap": "node scripts/generate-sitemap.js",
-    "submit-sitemap": "node scripts/submit-sitemap.js",
-    "init-category-counts": "npx tsx scripts/initialize-category-counts.ts"
+    "lint": "next lint"
   },
   "dependencies": {
     "@octokit/rest": "^21.1.1",
