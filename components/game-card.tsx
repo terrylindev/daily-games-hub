@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Game } from "@/lib/games-data";
 import FaviconImage from "./favicon-image";
+import ReportIssue from "./report-issue";
 
 interface GameCardProps {
   game: Game;
@@ -142,12 +143,20 @@ export default function GameCard({ game }: GameCardProps) {
           ))}
         </div>
 
-        <Button
-          className="mt-2 w-full cursor-pointer transition-colors hover:bg-primary/90"
-          onClick={handlePlayClick}
-        >
-          Play Now <ExternalLinkIcon className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="w-full flex items-center gap-2">
+          <Button
+            className="mt-2 flex-1 cursor-pointer transition-colors hover:bg-primary/90"
+            onClick={handlePlayClick}
+          >
+            Play Now <ExternalLinkIcon className="ml-2 h-4 w-4" />
+          </Button>
+          <ReportIssue
+            variant="icon"
+            gameName={game.name}
+            gameUrl={game.url}
+            className="mt-2 text-muted-foreground hover:text-foreground transition-colors"
+          />
+        </div>
       </CardFooter>
     </Card>
   );

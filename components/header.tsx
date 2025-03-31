@@ -15,6 +15,7 @@ import {
   Dices,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import ReportIssue from "./report-issue";
 
 export default function Header() {
   const { theme, setTheme } = useTheme();
@@ -66,6 +67,11 @@ export default function Header() {
               <Star className="h-3.5 w-3.5" />
               Favorites
             </Link>
+
+            <ReportIssue
+              buttonSize="default"
+              className="text-sm font-medium text-muted-foreground hover:text-primary"
+            />
           </nav>
         </div>
 
@@ -80,6 +86,8 @@ export default function Header() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </form>
+
+          <ReportIssue variant="icon" className="md:hidden" />
 
           <Button
             variant="ghost"
