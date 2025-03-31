@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 **Name:** ${name}
 **URL:** ${url}
 **Category:** ${category}
-**Tags:** ${tags || ''}
+**Tags:** ${Array.isArray(tags) ? tags.join(', ') : (tags || '')}
 
 **Description:**
 ${description}
@@ -64,7 +64,7 @@ ${description}
         description: description.trim().slice(0, 100),
         url,
         category,
-        tags: tags ? tags.split(',').map((tag: string) => tag.trim().toLowerCase()) : [],
+        tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map((tag: string) => tag.trim().toLowerCase()) : []),
         popularity: 1,
         createdAt: new Date()
       };
