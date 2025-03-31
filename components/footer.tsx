@@ -13,7 +13,7 @@ export default function Footer() {
             <span className="text-xs flex items-center justify-center gap-4 mt-2">
               <span>&copy; {new Date().getFullYear()} Daily Games Hub</span>
               <a
-                href="https://github.com/liny18/daily-games-hub"
+                href="https://github.com/terrylindev/daily-games-hub"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
