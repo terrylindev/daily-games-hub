@@ -2,46 +2,24 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { categories } from "@/lib/games-data";
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
 
-export default function CategoryFilter() {
+interface CategoryFilterProps {
+  categoryCounts: Record<string, number>;
+}
+
+export default function CategoryFilter({ categoryCounts }: CategoryFilterProps) {
   const pathname = usePathname();
   const currentCategory = pathname.startsWith("/category/")
     ? pathname.split("/").pop()
     : null;
   const [isLoading, setIsLoading] = useState(false);
-  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>(
-    {}
-  );
-  const [totalGames, setTotalGames] = useState(0);
-  const [isLoadingCounts, setIsLoadingCounts] = useState(true);
+  
+  const totalGames = categoryCounts.total || 0;
 
-  // Fetch game counts for each category
-  useEffect(() => {
-    async function fetchGameCounts() {
-      try {
-        setIsLoadingCounts(true);
-        const response = await fetch("/api/category-counts");
-        if (response.ok) {
-          const data = await response.json();
-
-          if (data.counts) {
-            setCategoryCounts(data.counts);
-            setTotalGames(data.counts.total || 0);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching category counts:", error);
-      } finally {
-        setIsLoadingCounts(false);
-      }
-    }
-
-    fetchGameCounts();
-  }, []);
 
   const handleSurpriseMe = () => {
     setIsLoading(true);
@@ -71,7 +49,7 @@ export default function CategoryFilter() {
           size="sm"
           className="cursor-pointer transition-colors hover:bg-primary/90 hover:text-primary-foreground"
         >
-          All Games {isLoadingCounts ? "..." : `(${totalGames})`}
+          All Games ({totalGames})
         </Button>
       </Link>
 
@@ -82,8 +60,7 @@ export default function CategoryFilter() {
             size="sm"
             className="cursor-pointer transition-colors hover:bg-primary/90 hover:text-primary-foreground"
           >
-            {category.name}{" "}
-            {isLoadingCounts ? "..." : `(${categoryCounts[category.id] || 0})`}
+            {category.name} ({categoryCounts[category.id] || 0})
           </Button>
         </Link>
       ))}

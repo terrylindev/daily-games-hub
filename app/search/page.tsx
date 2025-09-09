@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Game } from "@/lib/games-data";
 import { searchGames } from "@/lib/game-utils";
+import { getCategoryCounts } from "@/lib/db";
 import GamesGrid from "@/components/games-grid";
 import CategoryFilter from "@/components/category-filter";
 import type { Metadata } from "next";
@@ -44,6 +45,9 @@ export default async function SearchPage({ searchParams }: PageProps) {
   // Use MongoDB search function
   const mongoGames = query ? await searchGames(query) : [];
   const games = mongoGames.map((game) => game as unknown as Game);
+  
+  // Fetch category counts from cached database
+  const categoryCounts = await getCategoryCounts();
 
   return (
     <div className="space-y-8">
@@ -67,7 +71,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
         </p>
       </section>
 
-      <CategoryFilter />
+      <CategoryFilter categoryCounts={categoryCounts} />
 
       <Suspense fallback={<div>Searching games...</div>}>
         <GamesGrid games={games} />

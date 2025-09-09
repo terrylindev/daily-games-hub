@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Game } from "@/lib/games-data";
 import FaviconImage from "./favicon-image";
-import ReportIssue from "./report-issue";
 
 interface GameCardProps {
   game: Game;
@@ -24,8 +23,28 @@ export default function GameCard({ game }: GameCardProps) {
     setIsFavorite(favoriteGames.includes(game.id));
   }, [game.id]);
 
+  const trackInteraction = async (
+    type: "click" | "favorite" | "unfavorite"
+  ) => {
+    try {
+      await fetch("/api/track-interaction", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          gameId: game.id,
+          type,
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to track interaction:", error);
+    }
+  };
+
   const handlePlayClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    trackInteraction("click");
     window.open(game.url, "_blank", "noopener,noreferrer");
   };
 
@@ -38,21 +57,25 @@ export default function GameCard({ game }: GameCardProps) {
       localStorage.getItem("favoriteGames") || "[]"
     );
 
-    if (!isFavorite) {
+    const newFavoriteState = !isFavorite;
+
+    if (newFavoriteState) {
       // Add to favorites
       localStorage.setItem(
         "favoriteGames",
         JSON.stringify([...existingFavorites, game.id])
       );
+      trackInteraction("favorite");
     } else {
       // Remove from favorites
       localStorage.setItem(
         "favoriteGames",
         JSON.stringify(existingFavorites.filter((id: string) => id !== game.id))
       );
+      trackInteraction("unfavorite");
     }
 
-    setIsFavorite(!isFavorite);
+    setIsFavorite(newFavoriteState);
   };
 
   // Get category badge color
@@ -150,12 +173,6 @@ export default function GameCard({ game }: GameCardProps) {
           >
             Play Now <ExternalLinkIcon className="ml-2 h-4 w-4" />
           </Button>
-          <ReportIssue
-            variant="icon"
-            gameName={game.name}
-            gameUrl={game.url}
-            className="mt-2 text-muted-foreground hover:text-foreground transition-colors"
-          />
         </div>
       </CardFooter>
     </Card>

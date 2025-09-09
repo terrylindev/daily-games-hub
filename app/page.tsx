@@ -7,6 +7,7 @@ import {
   getGamesFromMongoDB,
   getGamesByCategory as getGamesByCategoryFromDB,
 } from "@/lib/game-utils";
+import { getCategoryCounts } from "@/lib/db";
 import type { Metadata } from "next";
 
 // This makes the page dynamic so it fetches fresh data on each request
@@ -26,6 +27,9 @@ export default async function Home() {
   // Fetch all games from MongoDB
   const mongoGames = await getGamesFromMongoDB();
   const games = mongoGames.map((game) => game as unknown as Game);
+
+  // Fetch category counts from cached database
+  const categoryCounts = await getCategoryCounts();
 
   // Get popular games (sorted by popularity)
   const popularGames = [...games]
@@ -52,7 +56,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <CategoryFilter />
+      <CategoryFilter categoryCounts={categoryCounts} />
 
       <Suspense fallback={<div>Loading popular games...</div>}>
         <ExpandableGamesGrid

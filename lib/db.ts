@@ -1,5 +1,5 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
-import { Game } from './games-data';
+import { Game, GameInteraction, GameStats } from './games-data';
 
 // MongoDB connection URI (from environment variables)
 const uri = process.env.MONGODB_URI || '';
@@ -324,3 +324,137 @@ export async function decrementCategoryCount(categoryId: string) {
     return false;
   }
 }
+
+/**
+ * Track a game interaction (click, favorite, unfavorite)
+ */
+export async function trackGameInteraction(
+  gameId: string,
+  type: 'click' | 'favorite' | 'unfavorite',
+  sessionId?: string,
+  userAgent?: string
+): Promise<boolean> {
+  try {
+    const { db } = await connectToDatabase();
+    const interactionsCollection = db.collection('game_interactions');
+    
+    // Create interaction record
+    const interaction: GameInteraction = {
+      gameId,
+      type,
+      sessionId,
+      userAgent,
+      timestamp: new Date()
+    };
+    
+    // Insert the interaction
+    await interactionsCollection.insertOne(interaction);
+    
+    // Update game stats
+    await updateGameStats(gameId, type);
+    
+    return true;
+  } catch (error) {
+    console.error(`Error tracking ${type} interaction for game ${gameId}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Update aggregated game statistics
+ */
+async function updateGameStats(gameId: string, interactionType: 'click' | 'favorite' | 'unfavorite') {
+  try {
+    const { db } = await connectToDatabase();
+    const statsCollection = db.collection('game_stats');
+    
+    const updateOperation: { $set: { lastUpdated: Date }; $inc?: { totalClicks?: number; totalFavorites?: number } } = { 
+      $set: { lastUpdated: new Date() } 
+    };
+    
+    if (interactionType === 'click') {
+      updateOperation.$inc = { totalClicks: 1 };
+    } else if (interactionType === 'favorite') {
+      updateOperation.$inc = { totalFavorites: 1 };
+    } else if (interactionType === 'unfavorite') {
+      updateOperation.$inc = { totalFavorites: -1 };
+    }
+    
+    // Update stats (create if doesn't exist)
+    await statsCollection.updateOne(
+      { gameId },
+      updateOperation,
+      { upsert: true }
+    );
+    
+    // Recalculate popularity score for this game
+    await calculatePopularityScore(gameId);
+    
+  } catch (error) {
+    console.error(`Error updating stats for game ${gameId}:`, error);
+  }
+}
+
+/**
+ * Calculate popularity score based on interactions
+ */
+async function calculatePopularityScore(gameId: string) {
+  try {
+    const { db } = await connectToDatabase();
+    const statsCollection = db.collection('game_stats');
+    const gamesCollection = db.collection('games');
+    
+    // Get current stats
+    const stats = await statsCollection.findOne({ gameId });
+    
+    if (!stats) {
+      return;
+    }
+    
+    // Weighted scoring system
+    const clickWeight = 1;
+    const favoriteWeight = 3; // Favorites are more valuable
+    
+    const rawScore = (stats.totalClicks || 0) * clickWeight + (stats.totalFavorites || 0) * favoriteWeight;
+    
+    // Simple normalization to 1-5 scale
+    // You can adjust these thresholds based on your data
+    let popularityScore = 1;
+    if (rawScore >= 100) popularityScore = 5;
+    else if (rawScore >= 50) popularityScore = 4;
+    else if (rawScore >= 20) popularityScore = 3;
+    else if (rawScore >= 5) popularityScore = 2;
+    
+    // Update the stats with calculated score
+    await statsCollection.updateOne(
+      { gameId },
+      { $set: { popularityScore } }
+    );
+    
+    // Update the game's popularity field
+    await gamesCollection.updateOne(
+      { id: gameId },
+      { $set: { popularity: popularityScore } }
+    );
+    
+  } catch (error) {
+    console.error(`Error calculating popularity for game ${gameId}:`, error);
+  }
+}
+
+/**
+ * Get game statistics
+ */
+export async function getGameStats(gameId: string): Promise<GameStats | null> {
+  try {
+    const { db } = await connectToDatabase();
+    const collection = db.collection('game_stats');
+    
+    const stats = await collection.findOne({ gameId });
+    return stats as GameStats | null;
+  } catch (error) {
+    console.error(`Error getting stats for game ${gameId}:`, error);
+    return null;
+  }
+}
+

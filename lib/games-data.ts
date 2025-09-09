@@ -5,8 +5,24 @@ export type Game = {
   url: string;
   category: string;
   tags: string[];
-  popularity: number; // 1-5 scale for sorting
+  popularity: number; // 1-5 scale for sorting (calculated from interactions)
   createdAt?: Date; // For backward compatibility
+};
+
+export type GameInteraction = {
+  gameId: string;
+  type: 'click' | 'favorite' | 'unfavorite';
+  sessionId?: string; // Optional session tracking
+  userAgent?: string;
+  timestamp: Date;
+};
+
+export type GameStats = {
+  gameId: string;
+  totalClicks: number;
+  totalFavorites: number;
+  popularityScore: number; // Calculated weighted score
+  lastUpdated: Date;
 };
 
 export type Category = {

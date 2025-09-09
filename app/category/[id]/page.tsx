@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { categories } from "@/lib/games-data";
 import { getGamesByCategory as getGamesByCategoryFromDB } from "@/lib/game-utils";
+import { getCategoryCounts } from "@/lib/db";
 import GamesGrid from "@/components/games-grid";
 import CategoryFilter from "@/components/category-filter";
 import type { Metadata } from "next";
@@ -65,6 +66,10 @@ export default async function CategoryPage({ params }: PageProps) {
 
   // Use the MongoDB function to get games by category
   const gamesFromDB = await getGamesByCategoryFromDB(category.id);
+  
+  // Fetch category counts from cached database
+  const categoryCounts = await getCategoryCounts();
+  
   console.log(
     `Category page: Retrieved ${gamesFromDB.length} games for category ${category.id}`
   );
@@ -86,7 +91,7 @@ export default async function CategoryPage({ params }: PageProps) {
         <p className="mt-2 text-muted-foreground">{category.description}</p>
       </section>
 
-      <CategoryFilter />
+      <CategoryFilter categoryCounts={categoryCounts} />
 
       <Suspense fallback={<div>Loading games...</div>}>
         <GamesGrid games={gamesFromDB} />
