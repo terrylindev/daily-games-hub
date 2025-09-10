@@ -1,3 +1,4 @@
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
 import { categories, Game } from "@/lib/games-data";
 import CategoryFilter from "@/components/category-filter";
@@ -41,6 +42,7 @@ export default async function Home() {
 
   return (
     <div className="space-y-8">
+      <SpeedInsights />
       <section className="py-10">
         <div className="text-center space-y-6">
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
