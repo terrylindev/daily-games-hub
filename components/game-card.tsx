@@ -27,7 +27,8 @@ export default function GameCard({ game }: GameCardProps) {
     type: "click" | "favorite" | "unfavorite"
   ) => {
     try {
-      await fetch("/api/track-interaction", {
+      console.log(`Tracking ${type} for game:`, game.id);
+      const response = await fetch("/api/track-interaction", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,6 +38,13 @@ export default function GameCard({ game }: GameCardProps) {
           type,
         }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log(`${type} tracking result:`, result);
     } catch (error) {
       console.error("Failed to track interaction:", error);
     }

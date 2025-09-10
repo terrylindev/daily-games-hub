@@ -1,5 +1,5 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
-import { Game, GameInteraction, GameStats } from './games-data';
+import { Game, GameStats } from './games-data';
 
 // MongoDB connection URI (from environment variables)
 const uri = process.env.MONGODB_URI || '';
@@ -200,6 +200,28 @@ export async function updatePendingGameStatus(
 }
 
 /**
+ * Delete a pending game suggestion and its contact email when issue is closed
+ */
+export async function cleanupClosedIssue(issueNumber: number): Promise<boolean> {
+  try {
+    const { db } = await connectToDatabase();
+    
+    // Delete from both collections
+    const [pendingResult, contactResult] = await Promise.all([
+      db.collection('pending_games').deleteMany({ issueNumber }),
+      db.collection('contacts').deleteMany({ issueNumber })
+    ]);
+    
+    console.log(`Cleaned up issue #${issueNumber}: deleted ${pendingResult.deletedCount} pending games and ${contactResult.deletedCount} contacts`);
+    
+    return true;
+  } catch (error) {
+    console.error(`Error cleaning up issue #${issueNumber}:`, error);
+    return false;
+  }
+}
+
+/**
  * Get category counts from the database
  */
 export async function getCategoryCounts() {
@@ -330,29 +352,106 @@ export async function decrementCategoryCount(categoryId: string) {
  */
 export async function trackGameInteraction(
   gameId: string,
-  type: 'click' | 'favorite' | 'unfavorite',
-  sessionId?: string,
-  userAgent?: string
+  type: 'click' | 'favorite' | 'unfavorite'
 ): Promise<boolean> {
   try {
-    const { db } = await connectToDatabase();
-    const interactionsCollection = db.collection('game_interactions');
+    console.log(`trackGameInteraction called: gameId=${gameId}, type=${type}`);
     
-    // Create interaction record
-    const interaction: GameInteraction = {
-      gameId,
-      type,
-      sessionId,
-      userAgent,
-      timestamp: new Date()
+    const { db } = await connectToDatabase();
+    console.log('Connected to database successfully');
+    
+    const statsCollection = db.collection('game_stats');
+    const gamesCollection = db.collection('games');
+    
+    // Update game stats directly
+    const updateOperation: { $set: { lastUpdated: Date }; $inc?: { totalClicks?: number; totalFavorites?: number } } = { 
+      $set: { lastUpdated: new Date() } 
     };
     
-    // Insert the interaction
-    await interactionsCollection.insertOne(interaction);
+    if (type === 'click') {
+      updateOperation.$inc = { totalClicks: 1 };
+    } else if (type === 'favorite') {
+      updateOperation.$inc = { totalFavorites: 1 };
+    } else if (type === 'unfavorite') {
+      updateOperation.$inc = { totalFavorites: -1 };
+    }
     
-    // Update game stats
-    await updateGameStats(gameId, type);
+    console.log('Update operation:', JSON.stringify(updateOperation, null, 2));
     
+    // Update stats (create if doesn't exist)
+    // First try to update existing document
+    let updateResult = await statsCollection.updateOne(
+      { gameId },
+      updateOperation
+    );
+    
+    // If no document was found, create one with proper initialization
+    if (updateResult.matchedCount === 0) {
+      const initOperation = {
+        $set: { 
+          gameId,
+          lastUpdated: new Date(),
+          totalClicks: type === 'click' ? 1 : 0,
+          totalFavorites: type === 'favorite' ? 1 : (type === 'unfavorite' ? -1 : 0)
+        }
+      };
+      
+      updateResult = await statsCollection.updateOne(
+        { gameId },
+        initOperation,
+        { upsert: true }
+      );
+    }
+    
+    console.log('Stats update result:', {
+      matchedCount: updateResult.matchedCount,
+      modifiedCount: updateResult.modifiedCount,
+      upsertedCount: updateResult.upsertedCount,
+      upsertedId: updateResult.upsertedId
+    });
+    
+    // Recalculate and update popularity score
+    const stats = await statsCollection.findOne({ gameId });
+    console.log('Retrieved stats after update:', stats);
+    
+    if (stats) {
+      // Weighted scoring system
+      const clickWeight = 1;
+      const favoriteWeight = 3; // Favorites are more valuable
+      
+      const rawScore = (stats.totalClicks || 0) * clickWeight + (stats.totalFavorites || 0) * favoriteWeight;
+      console.log(`Calculated rawScore: ${rawScore} (clicks: ${stats.totalClicks || 0}, favorites: ${stats.totalFavorites || 0})`);
+      
+      // Simple normalization to 1-5 scale
+      let popularityScore = 1;
+      if (rawScore >= 100) popularityScore = 5;
+      else if (rawScore >= 50) popularityScore = 4;
+      else if (rawScore >= 20) popularityScore = 3;
+      else if (rawScore >= 5) popularityScore = 2;
+      
+      console.log(`Setting popularity score to: ${popularityScore}`);
+      
+      // Update both stats and game popularity
+      const [statsUpdateResult, gameUpdateResult] = await Promise.all([
+        statsCollection.updateOne(
+          { gameId },
+          { $set: { popularityScore } }
+        ),
+        gamesCollection.updateOne(
+          { id: gameId },
+          { $set: { popularity: popularityScore } }
+        )
+      ]);
+      
+      console.log('Final update results:', {
+        statsUpdate: { matchedCount: statsUpdateResult.matchedCount, modifiedCount: statsUpdateResult.modifiedCount },
+        gameUpdate: { matchedCount: gameUpdateResult.matchedCount, modifiedCount: gameUpdateResult.modifiedCount }
+      });
+    } else {
+      console.log('No stats found after update - this might indicate an issue');
+    }
+    
+    console.log('trackGameInteraction completed successfully');
     return true;
   } catch (error) {
     console.error(`Error tracking ${type} interaction for game ${gameId}:`, error);
@@ -360,87 +459,6 @@ export async function trackGameInteraction(
   }
 }
 
-/**
- * Update aggregated game statistics
- */
-async function updateGameStats(gameId: string, interactionType: 'click' | 'favorite' | 'unfavorite') {
-  try {
-    const { db } = await connectToDatabase();
-    const statsCollection = db.collection('game_stats');
-    
-    const updateOperation: { $set: { lastUpdated: Date }; $inc?: { totalClicks?: number; totalFavorites?: number } } = { 
-      $set: { lastUpdated: new Date() } 
-    };
-    
-    if (interactionType === 'click') {
-      updateOperation.$inc = { totalClicks: 1 };
-    } else if (interactionType === 'favorite') {
-      updateOperation.$inc = { totalFavorites: 1 };
-    } else if (interactionType === 'unfavorite') {
-      updateOperation.$inc = { totalFavorites: -1 };
-    }
-    
-    // Update stats (create if doesn't exist)
-    await statsCollection.updateOne(
-      { gameId },
-      updateOperation,
-      { upsert: true }
-    );
-    
-    // Recalculate popularity score for this game
-    await calculatePopularityScore(gameId);
-    
-  } catch (error) {
-    console.error(`Error updating stats for game ${gameId}:`, error);
-  }
-}
-
-/**
- * Calculate popularity score based on interactions
- */
-async function calculatePopularityScore(gameId: string) {
-  try {
-    const { db } = await connectToDatabase();
-    const statsCollection = db.collection('game_stats');
-    const gamesCollection = db.collection('games');
-    
-    // Get current stats
-    const stats = await statsCollection.findOne({ gameId });
-    
-    if (!stats) {
-      return;
-    }
-    
-    // Weighted scoring system
-    const clickWeight = 1;
-    const favoriteWeight = 3; // Favorites are more valuable
-    
-    const rawScore = (stats.totalClicks || 0) * clickWeight + (stats.totalFavorites || 0) * favoriteWeight;
-    
-    // Simple normalization to 1-5 scale
-    // You can adjust these thresholds based on your data
-    let popularityScore = 1;
-    if (rawScore >= 100) popularityScore = 5;
-    else if (rawScore >= 50) popularityScore = 4;
-    else if (rawScore >= 20) popularityScore = 3;
-    else if (rawScore >= 5) popularityScore = 2;
-    
-    // Update the stats with calculated score
-    await statsCollection.updateOne(
-      { gameId },
-      { $set: { popularityScore } }
-    );
-    
-    // Update the game's popularity field
-    await gamesCollection.updateOne(
-      { id: gameId },
-      { $set: { popularity: popularityScore } }
-    );
-    
-  } catch (error) {
-    console.error(`Error calculating popularity for game ${gameId}:`, error);
-  }
-}
 
 /**
  * Get game statistics

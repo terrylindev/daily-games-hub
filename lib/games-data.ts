@@ -9,14 +9,6 @@ export type Game = {
   createdAt?: Date; // For backward compatibility
 };
 
-export type GameInteraction = {
-  gameId: string;
-  type: 'click' | 'favorite' | 'unfavorite';
-  sessionId?: string; // Optional session tracking
-  userAgent?: string;
-  timestamp: Date;
-};
-
 export type GameStats = {
   gameId: string;
   totalClicks: number;

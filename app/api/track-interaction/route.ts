@@ -22,12 +22,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Get optional tracking data
-    const sessionId = request.headers.get('x-session-id') || undefined;
-    const userAgent = request.headers.get('user-agent') || undefined;
-    
     // Track the interaction
-    const success = await trackGameInteraction(gameId, type, sessionId, userAgent);
+    const success = await trackGameInteraction(gameId, type);
     
     if (!success) {
       return NextResponse.json(

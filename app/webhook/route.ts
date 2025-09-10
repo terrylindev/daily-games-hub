@@ -5,9 +5,9 @@ import { sendNotification } from '@/lib/email-utils';
 import { addGameToDataFile, capitalizeWords, capitalizeFirstLetter } from '@/lib/game-utils';
 import { 
   getContactEmail, 
-  deleteContactEmail, 
   getPendingGameByIssueNumber,
-  updatePendingGameStatus
+  updatePendingGameStatus,
+  cleanupClosedIssue
 } from '@/lib/db';
 
 // Initialize Octokit with GitHub token
@@ -266,11 +266,6 @@ export async function POST(request: Request) {
                 );
                 console.log(`Notification email sent (${status}):`, emailSent);
                 
-                // Delete the contact email after it's been used
-                if (emailSent && !pendingGame?.contactEmail) {
-                  const deleted = await deleteContactEmail(data.issue.number);
-                  console.log('Contact email deleted:', deleted);
-                }
                 
                 console.log(`Sent '${status}' notification to ${email} for game "${gameToAdd.name}"`);
               } catch (error) {
@@ -333,11 +328,6 @@ export async function POST(request: Request) {
             );
             console.log('Rejection notification email sent:', emailSent);
             
-            // Delete the contact email after it's been used
-            if (emailSent && !pendingGame?.contactEmail) {
-              const deleted = await deleteContactEmail(data.issue.number);
-              console.log('Contact email deleted after rejection:', deleted);
-            }
             
             console.log(`Sent 'rejected' notification to ${email} for game "${pendingGame?.gameData?.name || gameName}"`);
           } catch (error) {
@@ -355,6 +345,12 @@ export async function POST(request: Request) {
         console.error('Error processing rejected game:', error);
         return NextResponse.json({ error: 'Failed to process rejected game' }, { status: 500 });
       }
+    }
+    
+    // Clean up the database records for any closed game suggestion issue
+    if (issueTitle.startsWith('Game Suggestion:')) {
+      console.log('Cleaning up database records for closed issue');
+      await cleanupClosedIssue(data.issue.number);
     }
     
     console.log('No action taken for this webhook');
