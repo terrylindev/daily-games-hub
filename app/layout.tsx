@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     title: "Daily Games Hub | Your One-Stop Directory for Popular Daily Games",
     description:
       "Discover and play the best daily games like Wordle, Connections, TimeGuessr and more.",
-    images: ["/images/twitter-image.jpg"],
+    images: ["/images/og-image.jpg"],
   },
   icons: {
     icon: "/favicon.ico",
