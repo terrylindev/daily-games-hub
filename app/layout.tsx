@@ -21,12 +21,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default:
-      "Daily Games Hub | Your One-Stop Directory for Popular Daily Games",
+    default: "Daily Games Hub | Play Wordle, Connections & More",
     template: "%s | Daily Games Hub",
   },
-  description:
-    "Discover and play the best daily games like Wordle, Connections, TimeGuessr and more. Your curated collection of word puzzles, geography games, and daily challenges.",
+  description: "All your daily games in one place.",
   keywords: [
     "daily games",
     "wordle",
@@ -49,9 +47,8 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Daily Games Hub | Your One-Stop Directory for Popular Daily Games",
-    description:
-      "Discover and play the best daily games like Wordle, Connections, TimeGuessr and more.",
+    title: "Daily Games Hub | Play Wordle, Connections & More",
+    description: "All your daily games in one place.",
     url: "https://dailygameshub.com",
     siteName: "Daily Games Hub",
     locale: "en_US",
@@ -67,9 +64,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Daily Games Hub | Your One-Stop Directory for Popular Daily Games",
-    description:
-      "Discover and play the best daily games like Wordle, Connections, TimeGuessr and more.",
+    title: "Daily Games Hub | Play Wordle, Connections & More",
+    description: "All your daily games in one place.",
     images: ["/images/og-image.jpg"],
   },
   icons: {
@@ -110,7 +106,7 @@ export default function RootLayout({
         <WebsiteJSONLD
           url="https://dailygameshub.com"
           name="Daily Games Hub"
-          description="Your one-stop directory for popular daily games like Wordle, Connections, TimeGuessr and more."
+          description="All your daily games in one place."
         />
       </head>
       <body

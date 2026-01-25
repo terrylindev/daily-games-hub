@@ -13,6 +13,7 @@ import {
   Home,
   Gamepad2,
   Dices,
+  Github,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import ReportIssue from "./report-issue";
@@ -88,6 +89,16 @@ export default function Header() {
           </form>
 
           <ReportIssue variant="icon" className="md:hidden" />
+
+          <a
+            href="https://github.com/terrylindev/daily-games-hub"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent hover:text-accent-foreground hover:scale-110 transition-all duration-200"
+          >
+            <Github className="h-5 w-5" />
+            <span className="sr-only">GitHub Repository</span>
+          </a>
 
           <Button
             variant="ghost"

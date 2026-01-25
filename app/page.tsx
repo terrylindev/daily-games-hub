@@ -16,9 +16,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0; // Disable static generation completely
 
 export const metadata: Metadata = {
-  title: "Daily Games Hub | Your One-Stop Directory for Popular Daily Games",
-  description:
-    "Discover and play the best daily games like Wordle, Connections, TimeGuessr and more. Your curated collection of word puzzles, geography games, and daily challenges.",
+  title: "Daily Games Hub | Play Wordle, Connections & More",
+  description: "All your daily games in one place.",
   alternates: {
     canonical: "/",
   },
@@ -49,8 +48,7 @@ export default async function Home() {
             Daily Games Hub
           </h1>
           <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-            Your one-stop directory for popular daily games like Wordle,
-            Connections, and more.
+            All your daily games in one place.
           </p>
           <div className="flex justify-center mt-8">
             <SuggestGame />
